@@ -46,7 +46,8 @@ Campos obrigatórios para qualquer usuário:
 - Data da última alteração (Date);
 - Endereço (String ou objeto com atributos como rua, número, cidade, CEP).
 
-## Entregáveis e Critérios de Avaliação:
+## Entregáveis e Critérios de Avaliação
+
 ### 1. Funcionalidade
    - O backend deve atender a todos os requisitos especificados;
    - Os endpoints devem funcionar corretamente, com tratamento de erros adequado;
