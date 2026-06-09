@@ -1,0 +1,930 @@
+openapi: 3.0.3
+info:
+  title: Tech Challenge - Sistema de Gestão de Restaurantes
+  description: |
+    API REST para o sistema de gestão compartilhado de restaurantes — **Fase 02**.
+
+    Cobre os seguintes módulos:
+    - **Usuários** — CRUD completo de usuários
+    - **Tipos de Usuário** — CRUD + associação com usuários (Dono de Restaurante / Cliente)
+    - **Restaurantes** — CRUD completo com vínculo ao dono
+    - **Cardápio** — CRUD dos itens vendidos em cada restaurante
+
+    > Desenvolvido por **Mauricio Borges Florencio** — FIAP PósTech · Arquitetura e Desenvolvimento Java
+  version: 2.0.0
+  contact:
+    name: Mauricio Borges Florencio
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Ambiente local (Docker Compose)
+
+tags:
+  - name: Usuários
+    description: Gerenciamento de usuários do sistema
+  - name: Tipos de Usuário
+    description: Gerenciamento dos tipos de usuário (Dono de Restaurante / Cliente)
+  - name: Restaurantes
+    description: Gerenciamento de restaurantes
+  - name: Cardápio
+    description: Gerenciamento dos itens do cardápio de cada restaurante
+
+# ─────────────────────────────────────────────────────────────
+# PATHS
+# ─────────────────────────────────────────────────────────────
+paths:
+
+  # ══════════════════════════════════════════
+  # USUÁRIOS
+  # ══════════════════════════════════════════
+  /usuarios:
+    get:
+      tags: [Usuários]
+      summary: Listar todos os usuários
+      operationId: listarUsuarios
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: Lista paginada de usuários
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageUsuario'
+    post:
+      tags: [Usuários]
+      summary: Criar novo usuário
+      operationId: criarUsuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+            example:
+              nome: João Silva
+              email: joao.silva@email.com
+              senha: "Senha@123"
+              telefone: "11999998888"
+      responses:
+        '201':
+          description: Usuário criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /usuarios/{id}:
+    get:
+      tags: [Usuários]
+      summary: Buscar usuário por ID
+      operationId: buscarUsuarioPorId
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Usuário encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Usuários]
+      summary: Atualizar usuário
+      operationId: atualizarUsuario
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+      responses:
+        '200':
+          description: Usuário atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+    delete:
+      tags: [Usuários]
+      summary: Remover usuário
+      operationId: removerUsuario
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Usuário removido com sucesso
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /usuarios/{id}/tipo-usuario:
+    put:
+      tags: [Usuários]
+      summary: Associar tipo de usuário a um usuário
+      operationId: associarTipoUsuario
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssociarTipoUsuarioRequest'
+            example:
+              tipoUsuarioId: 1
+      responses:
+        '200':
+          description: Tipo de usuário associado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ══════════════════════════════════════════
+  # TIPOS DE USUÁRIO
+  # ══════════════════════════════════════════
+  /tipos-usuario:
+    get:
+      tags: [Tipos de Usuário]
+      summary: Listar todos os tipos de usuário
+      operationId: listarTiposUsuario
+      responses:
+        '200':
+          description: Lista de tipos de usuário
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TipoUsuarioResponse'
+    post:
+      tags: [Tipos de Usuário]
+      summary: Criar novo tipo de usuário
+      operationId: criarTipoUsuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TipoUsuarioRequest'
+            example:
+              nome: Dono de Restaurante
+      responses:
+        '201':
+          description: Tipo de usuário criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TipoUsuarioResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /tipos-usuario/{id}:
+    get:
+      tags: [Tipos de Usuário]
+      summary: Buscar tipo de usuário por ID
+      operationId: buscarTipoUsuarioPorId
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Tipo de usuário encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TipoUsuarioResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Tipos de Usuário]
+      summary: Atualizar tipo de usuário
+      operationId: atualizarTipoUsuario
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TipoUsuarioRequest'
+      responses:
+        '200':
+          description: Tipo de usuário atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TipoUsuarioResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Tipos de Usuário]
+      summary: Remover tipo de usuário
+      operationId: removerTipoUsuario
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Tipo de usuário removido
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Tipo em uso — não pode ser removido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ══════════════════════════════════════════
+  # RESTAURANTES
+  # ══════════════════════════════════════════
+  /restaurantes:
+    get:
+      tags: [Restaurantes]
+      summary: Listar todos os restaurantes
+      operationId: listarRestaurantes
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - name: tipoCozinha
+          in: query
+          description: Filtrar por tipo de cozinha
+          schema:
+            type: string
+          example: Italiana
+      responses:
+        '200':
+          description: Lista paginada de restaurantes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageRestaurante'
+    post:
+      tags: [Restaurantes]
+      summary: Criar novo restaurante
+      operationId: criarRestaurante
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestauranteRequest'
+            example:
+              nome: Trattoria do Chef
+              endereco:
+                logradouro: Rua das Flores
+                numero: "123"
+                complemento: Sala 2
+                bairro: Centro
+                cidade: São Paulo
+                estado: SP
+                cep: "01001-000"
+              tipoCozinha: Italiana
+              horarioFuncionamento:
+                abertura: "11:00"
+                fechamento: "23:00"
+                diasFuncionamento: [SEGUNDA, TERCA, QUARTA, QUINTA, SEXTA, SABADO]
+              donoId: 1
+      responses:
+        '201':
+          description: Restaurante criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestauranteResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Usuário dono não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /restaurantes/{id}:
+    get:
+      tags: [Restaurantes]
+      summary: Buscar restaurante por ID
+      operationId: buscarRestaurantePorId
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Restaurante encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestauranteResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Restaurantes]
+      summary: Atualizar restaurante
+      operationId: atualizarRestaurante
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestauranteRequest'
+      responses:
+        '200':
+          description: Restaurante atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestauranteResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Restaurantes]
+      summary: Remover restaurante
+      operationId: removerRestaurante
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Restaurante removido
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ══════════════════════════════════════════
+  # CARDÁPIO
+  # ══════════════════════════════════════════
+  /restaurantes/{restauranteId}/cardapio:
+    get:
+      tags: [Cardápio]
+      summary: Listar itens do cardápio de um restaurante
+      operationId: listarCardapio
+      parameters:
+        - $ref: '#/components/parameters/RestauranteId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - name: disponivel
+          in: query
+          description: Filtrar apenas itens disponíveis
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Lista paginada do cardápio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageItemCardapio'
+        '404':
+          description: Restaurante não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags: [Cardápio]
+      summary: Adicionar item ao cardápio
+      operationId: criarItemCardapio
+      parameters:
+        - $ref: '#/components/parameters/RestauranteId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemCardapioRequest'
+            example:
+              nome: Lasanha à Bolonhesa
+              descricao: Lasanha tradicional com molho bolonhesa caseiro e queijo parmesão
+              preco: 49.90
+              apenasNoLocal: false
+              fotoPath: /uploads/fotos/lasanha-bolonhesa.jpg
+      responses:
+        '201':
+          description: Item criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemCardapioResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Restaurante não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /restaurantes/{restauranteId}/cardapio/{itemId}:
+    get:
+      tags: [Cardápio]
+      summary: Buscar item do cardápio por ID
+      operationId: buscarItemCardapioPorId
+      parameters:
+        - $ref: '#/components/parameters/RestauranteId'
+        - $ref: '#/components/parameters/ItemId'
+      responses:
+        '200':
+          description: Item encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemCardapioResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Cardápio]
+      summary: Atualizar item do cardápio
+      operationId: atualizarItemCardapio
+      parameters:
+        - $ref: '#/components/parameters/RestauranteId'
+        - $ref: '#/components/parameters/ItemId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemCardapioRequest'
+      responses:
+        '200':
+          description: Item atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemCardapioResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Cardápio]
+      summary: Remover item do cardápio
+      operationId: removerItemCardapio
+      parameters:
+        - $ref: '#/components/parameters/RestauranteId'
+        - $ref: '#/components/parameters/ItemId'
+      responses:
+        '204':
+          description: Item removido
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+# ─────────────────────────────────────────────────────────────
+# COMPONENTS
+# ─────────────────────────────────────────────────────────────
+components:
+
+  # ── Parameters ───────────────────────────────────────────
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+      example: 1
+
+    RestauranteId:
+      name: restauranteId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+      example: 1
+
+    ItemId:
+      name: itemId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+      example: 1
+
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        default: 0
+      description: Número da página (0-based)
+
+    Size:
+      name: size
+      in: query
+      schema:
+        type: integer
+        default: 10
+      description: Tamanho da página
+
+  # ── Responses ────────────────────────────────────────────
+  responses:
+    BadRequest:
+      description: Dados inválidos na requisição
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            timestamp: "2025-06-01T10:00:00Z"
+            status: 400
+            error: Bad Request
+            message: Campo 'nome' é obrigatório
+            path: /api/v1/usuarios
+
+    NotFound:
+      description: Recurso não encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            timestamp: "2025-06-01T10:00:00Z"
+            status: 404
+            error: Not Found
+            message: Recurso com id 99 não encontrado
+            path: /api/v1/usuarios/99
+
+    Conflict:
+      description: Conflito — recurso já existente
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            timestamp: "2025-06-01T10:00:00Z"
+            status: 409
+            error: Conflict
+            message: E-mail já cadastrado
+            path: /api/v1/usuarios
+
+  # ── Schemas ──────────────────────────────────────────────
+  schemas:
+
+    # ---- Usuário ----
+    UsuarioRequest:
+      type: object
+      required: [nome, email, senha]
+      properties:
+        nome:
+          type: string
+          minLength: 2
+          maxLength: 100
+          example: João Silva
+        email:
+          type: string
+          format: email
+          example: joao.silva@email.com
+        senha:
+          type: string
+          format: password
+          minLength: 6
+          example: "Senha@123"
+        telefone:
+          type: string
+          example: "11999998888"
+
+    UsuarioResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        nome:
+          type: string
+          example: João Silva
+        email:
+          type: string
+          example: joao.silva@email.com
+        telefone:
+          type: string
+          example: "11999998888"
+        tipoUsuario:
+          $ref: '#/components/schemas/TipoUsuarioResponse'
+        criadoEm:
+          type: string
+          format: date-time
+          example: "2025-06-01T10:00:00Z"
+        atualizadoEm:
+          type: string
+          format: date-time
+          example: "2025-06-01T10:00:00Z"
+
+    PageUsuario:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/UsuarioResponse'
+        totalElements:
+          type: integer
+          example: 50
+        totalPages:
+          type: integer
+          example: 5
+        size:
+          type: integer
+          example: 10
+        number:
+          type: integer
+          example: 0
+
+    AssociarTipoUsuarioRequest:
+      type: object
+      required: [tipoUsuarioId]
+      properties:
+        tipoUsuarioId:
+          type: integer
+          format: int64
+          example: 1
+
+    # ---- Tipo de Usuário ----
+    TipoUsuarioRequest:
+      type: object
+      required: [nome]
+      properties:
+        nome:
+          type: string
+          minLength: 2
+          maxLength: 50
+          example: Dono de Restaurante
+
+    TipoUsuarioResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        nome:
+          type: string
+          example: Dono de Restaurante
+        criadoEm:
+          type: string
+          format: date-time
+          example: "2025-06-01T10:00:00Z"
+
+    # ---- Restaurante ----
+    RestauranteRequest:
+      type: object
+      required: [nome, endereco, tipoCozinha, horarioFuncionamento, donoId]
+      properties:
+        nome:
+          type: string
+          minLength: 2
+          maxLength: 100
+          example: Trattoria do Chef
+        endereco:
+          $ref: '#/components/schemas/EnderecoRequest'
+        tipoCozinha:
+          type: string
+          example: Italiana
+        horarioFuncionamento:
+          $ref: '#/components/schemas/HorarioFuncionamentoRequest'
+        donoId:
+          type: integer
+          format: int64
+          description: ID do usuário dono do restaurante
+          example: 1
+
+    RestauranteResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        nome:
+          type: string
+          example: Trattoria do Chef
+        endereco:
+          $ref: '#/components/schemas/EnderecoResponse'
+        tipoCozinha:
+          type: string
+          example: Italiana
+        horarioFuncionamento:
+          $ref: '#/components/schemas/HorarioFuncionamentoResponse'
+        dono:
+          $ref: '#/components/schemas/UsuarioResponse'
+        criadoEm:
+          type: string
+          format: date-time
+          example: "2025-06-01T10:00:00Z"
+        atualizadoEm:
+          type: string
+          format: date-time
+          example: "2025-06-01T10:00:00Z"
+
+    PageRestaurante:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/RestauranteResponse'
+        totalElements:
+          type: integer
+          example: 20
+        totalPages:
+          type: integer
+          example: 2
+        size:
+          type: integer
+          example: 10
+        number:
+          type: integer
+          example: 0
+
+    # ---- Endereço ----
+    EnderecoRequest:
+      type: object
+      required: [logradouro, numero, bairro, cidade, estado, cep]
+      properties:
+        logradouro:
+          type: string
+          example: Rua das Flores
+        numero:
+          type: string
+          example: "123"
+        complemento:
+          type: string
+          example: Sala 2
+        bairro:
+          type: string
+          example: Centro
+        cidade:
+          type: string
+          example: São Paulo
+        estado:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: SP
+        cep:
+          type: string
+          pattern: '^\d{5}-\d{3}$'
+          example: "01001-000"
+
+    EnderecoResponse:
+      allOf:
+        - $ref: '#/components/schemas/EnderecoRequest'
+        - type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+              example: 1
+
+    # ---- Horário de Funcionamento ----
+    HorarioFuncionamentoRequest:
+      type: object
+      required: [abertura, fechamento, diasFuncionamento]
+      properties:
+        abertura:
+          type: string
+          pattern: '^\d{2}:\d{2}$'
+          example: "11:00"
+        fechamento:
+          type: string
+          pattern: '^\d{2}:\d{2}$'
+          example: "23:00"
+        diasFuncionamento:
+          type: array
+          items:
+            type: string
+            enum: [SEGUNDA, TERCA, QUARTA, QUINTA, SEXTA, SABADO, DOMINGO]
+          example: [SEGUNDA, TERCA, QUARTA, QUINTA, SEXTA, SABADO]
+
+    HorarioFuncionamentoResponse:
+      allOf:
+        - $ref: '#/components/schemas/HorarioFuncionamentoRequest'
+
+    # ---- Item Cardápio ----
+    ItemCardapioRequest:
+      type: object
+      required: [nome, descricao, preco, apenasNoLocal]
+      properties:
+        nome:
+          type: string
+          minLength: 2
+          maxLength: 100
+          example: Lasanha à Bolonhesa
+        descricao:
+          type: string
+          maxLength: 500
+          example: Lasanha tradicional com molho bolonhesa caseiro e queijo parmesão
+        preco:
+          type: number
+          format: double
+          minimum: 0.01
+          example: 49.90
+        apenasNoLocal:
+          type: boolean
+          description: Indica se o item só pode ser consumido no restaurante
+          example: false
+        fotoPath:
+          type: string
+          description: Caminho de armazenamento da foto do prato
+          example: /uploads/fotos/lasanha-bolonhesa.jpg
+
+    ItemCardapioResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        nome:
+          type: string
+          example: Lasanha à Bolonhesa
+        descricao:
+          type: string
+          example: Lasanha tradicional com molho bolonhesa caseiro e queijo parmesão
+        preco:
+          type: number
+          format: double
+          example: 49.90
+        apenasNoLocal:
+          type: boolean
+          example: false
+        fotoPath:
+          type: string
+          example: /uploads/fotos/lasanha-bolonhesa.jpg
+        restauranteId:
+          type: integer
+          format: int64
+          example: 1
+        criadoEm:
+          type: string
+          format: date-time
+          example: "2025-06-01T10:00:00Z"
+        atualizadoEm:
+          type: string
+          format: date-time
+          example: "2025-06-01T10:00:00Z"
+
+    PageItemCardapio:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemCardapioResponse'
+        totalElements:
+          type: integer
+          example: 30
+        totalPages:
+          type: integer
+          example: 3
+        size:
+          type: integer
+          example: 10
+        number:
+          type: integer
+          example: 0
+
+    # ---- Erro ----
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          example: "2025-06-01T10:00:00Z"
+        status:
+          type: integer
+          example: 404
+        error:
+          type: string
+          example: Not Found
+        message:
+          type: string
+          example: Recurso com id 99 não encontrado
+        path:
+          type: string
+          example: /api/v1/restaurantes/99
