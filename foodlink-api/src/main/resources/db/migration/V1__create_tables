@@ -1,0 +1,82 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE users_type (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    description VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE address (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    address_logradouro VARCHAR(255),
+    address_numero VARCHAR(50),
+    address_complemento VARCHAR(255),
+    address_bairro VARCHAR(255),
+    address_cidade VARCHAR(255),
+    address_uf VARCHAR(10),
+    address_cep VARCHAR(20),
+    data_ultima_alteracao TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    nome VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    login VARCHAR(255) NOT NULL UNIQUE,
+    senha VARCHAR(255) NOT NULL,
+    data_ultima_alteracao TIMESTAMP WITH TIME ZONE NOT NULL,
+    tipo_usuario_id UUID NOT NULL,
+    endereco_id UUID NOT NULL,
+
+    CONSTRAINT fk_user_tipo
+        FOREIGN KEY (tipo_usuario_id)
+        REFERENCES users_type(id),
+
+    CONSTRAINT fk_user_endereco
+        FOREIGN KEY (endereco_id)
+        REFERENCES address(id)
+);
+
+CREATE TABLE restaurants (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    nome VARCHAR(255) NOT NULL,
+    cnpj VARCHAR(18) NOT NULL UNIQUE,
+    endereco_id UUID NOT NULL,
+    data_ultima_alteracao TIMESTAMP WITH TIME ZONE NOT NULL,
+    tipo_cozinha VARCHAR(255) NOT NULL,
+    dono_restaurante_id UUID NOT NULL,
+
+    CONSTRAINT fk_restaurant_endereco
+        FOREIGN KEY (endereco_id)
+        REFERENCES address(id),
+
+    CONSTRAINT fk_restaurant_dono
+        FOREIGN KEY (dono_restaurante_id)
+        REFERENCES users(id)
+);
+
+CREATE TABLE restaurant_opening_hours (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    restaurant_id UUID NOT NULL,
+    dia_semana VARCHAR(20) NOT NULL,
+    hora_abertura TIME NOT NULL,
+    hora_encerramento TIME NOT NULL,
+
+    CONSTRAINT fk_opening_hours_restaurant
+        FOREIGN KEY (restaurant_id)
+        REFERENCES restaurants(id)
+);
+
+CREATE TABLE menu (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    nome VARCHAR(255) NOT NULL,
+    descricao VARCHAR(400) NOT NULL,
+    preco DECIMAL(10,2) NOT NULL,
+    restaurante_id UUID NOT NULL,
+    foto_url VARCHAR(255),
+    disponibilidade_entrega BOOLEAN NOT NULL,
+    data_ultima_alteracao TIMESTAMP WITH TIME ZONE NOT NULL,
+
+    CONSTRAINT fk_menu_restaurante
+        FOREIGN KEY (restaurante_id)
+        REFERENCES restaurants(id)
+);
