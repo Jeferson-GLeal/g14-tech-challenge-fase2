@@ -1,0 +1,50 @@
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+*.log
+hs_err_pid*
+replay_pid*
+
+# Test and coverage reports
+surefire-reports/
+failsafe-reports/
+jacoco.exec
+coverage/
+
+# IDEs and editors0
+.idea/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment and local config
+.env
+.env.*
+!.env.example
+application-local.yml
+application-local.yaml
+application-local.properties
+
+# Docker local data
+docker-data/
+data/
+
+# AI tool local config
+.ai/
+.codex/
+.agents/
