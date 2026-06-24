@@ -1,6 +1,9 @@
 package com.fiap.foodlink_api.interfaces.controller.handler;
 
 import com.fiap.foodlink_api.domain.exception.DomainException;
+import com.fiap.foodlink_api.domain.exception.AddressNotFoundException;
+import com.fiap.foodlink_api.domain.exception.UserAlreadyExistsException;
+import com.fiap.foodlink_api.domain.exception.UserNotFoundException;
 import com.fiap.foodlink_api.domain.exception.UserTypeAlreadyExistsException;
 import com.fiap.foodlink_api.domain.exception.UserTypeNotFoundException;
 import com.fiap.foodlink_api.interfaces.controller.dto.ErrorResponse;
@@ -19,8 +22,23 @@ public class GlobalExceptionHandler {
 		return buildErrorResponse(exception.getMessage(), HttpStatus.NOT_FOUND);
 	}
 
+	@ExceptionHandler(UserNotFoundException.class)
+	public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException exception) {
+		return buildErrorResponse(exception.getMessage(), HttpStatus.NOT_FOUND);
+	}
+
+	@ExceptionHandler(AddressNotFoundException.class)
+	public ResponseEntity<ErrorResponse> handleAddressNotFound(AddressNotFoundException exception) {
+		return buildErrorResponse(exception.getMessage(), HttpStatus.NOT_FOUND);
+	}
+
 	@ExceptionHandler(UserTypeAlreadyExistsException.class)
 	public ResponseEntity<ErrorResponse> handleUserTypeAlreadyExists(UserTypeAlreadyExistsException exception) {
+		return buildErrorResponse(exception.getMessage(), HttpStatus.CONFLICT);
+	}
+
+	@ExceptionHandler(UserAlreadyExistsException.class)
+	public ResponseEntity<ErrorResponse> handleUserAlreadyExists(UserAlreadyExistsException exception) {
 		return buildErrorResponse(exception.getMessage(), HttpStatus.CONFLICT);
 	}
 
