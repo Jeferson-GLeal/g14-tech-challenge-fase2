@@ -4,15 +4,15 @@ services:
 
   postgres:
     image: postgres:15
-    container_name: foodlink-postgres
+    container_name: foodlink-postgres-fase-2
     environment:
-      POSTGRES_DB: db_foodlink
+      POSTGRES_DB: db_foodlink_v2
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_fase_2:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -21,7 +21,7 @@ services:
 
   app:
     build: .
-    container_name: foodlink-api
+    container_name: foodlink-api-fase-2
     depends_on:
       postgres:
         condition: service_healthy
@@ -31,4 +31,4 @@ services:
       SPRING_PROFILES_ACTIVE: docker
 
 volumes:
-  postgres_data:
+  postgres_data_fase_2:
