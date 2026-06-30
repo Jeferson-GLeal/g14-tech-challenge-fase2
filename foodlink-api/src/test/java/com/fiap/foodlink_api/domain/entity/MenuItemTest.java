@@ -75,14 +75,13 @@ class MenuItemTest {
 	@Test
 	@DisplayName("Deve atualizar item do cardapio")
 	void deveAtualizarItemDoCardapio() {
-		UUID restaurantId = UUID.randomUUID();
 		MenuItem menuItem = criarMenuItem();
+		UUID restaurantId = menuItem.getRestaurantId();
 
 		menuItem.update(
 				"Hamburguer Artesanal",
 				"Hamburguer com queijo e molho da casa",
 				new BigDecimal("39.90"),
-				restaurantId,
 				"fotos/hamburguer-artesanal.png",
 				true
 		);
@@ -114,12 +113,37 @@ class MenuItemTest {
 				"Hamburguer Artesanal",
 				"Hamburguer com queijo e molho da casa",
 				new BigDecimal("39.90"),
-				UUID.randomUUID(),
 				"fotos/hamburguer-artesanal.png",
 				true
 		);
 
 		assertEquals(id, menuItem.getId());
+	}
+
+	@Test
+	@DisplayName("Deve manter restaurante ao atualizar item do cardapio")
+	void deveManterRestauranteAoAtualizarItemDoCardapio() {
+		UUID restaurantId = UUID.randomUUID();
+		MenuItem menuItem = new MenuItem(
+				UUID.randomUUID(),
+				"Pizza Margherita",
+				"Pizza com molho de tomate, mussarela e manjericao",
+				new BigDecimal("49.90"),
+				restaurantId,
+				"fotos/pizza-margherita.png",
+				false,
+				OffsetDateTime.parse("2026-06-24T01:00:00-03:00")
+		);
+
+		menuItem.update(
+				"Hamburguer Artesanal",
+				"Hamburguer com queijo e molho da casa",
+				new BigDecimal("39.90"),
+				"fotos/hamburguer-artesanal.png",
+				true
+		);
+
+		assertEquals(restaurantId, menuItem.getRestaurantId());
 	}
 
 	@Test

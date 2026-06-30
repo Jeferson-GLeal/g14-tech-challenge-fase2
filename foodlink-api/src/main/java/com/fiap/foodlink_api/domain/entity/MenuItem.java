@@ -97,14 +97,12 @@ public class MenuItem {
 			String name,
 			String description,
 			BigDecimal price,
-			UUID restaurantId,
 			String photoPath,
 			boolean availableOnlyAtRestaurant
 	) {
 		setName(name);
 		setDescription(description);
 		setPrice(price);
-		setRestaurantId(restaurantId);
 		setPhotoPath(photoPath);
 		setAvailableOnlyAtRestaurant(availableOnlyAtRestaurant);
 		touch();
