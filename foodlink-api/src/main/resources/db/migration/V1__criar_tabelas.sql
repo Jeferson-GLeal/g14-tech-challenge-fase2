@@ -57,7 +57,7 @@ CREATE TABLE restaurantes (
 CREATE TABLE horarios_funcionamento_restaurante (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     restaurante_id UUID NOT NULL,
-    dia_semana VARCHAR(20) NOT NULL,
+    dias_semana VARCHAR(20) NOT NULL,
     hora_abertura TIME NOT NULL,
     hora_encerramento TIME NOT NULL,
 
