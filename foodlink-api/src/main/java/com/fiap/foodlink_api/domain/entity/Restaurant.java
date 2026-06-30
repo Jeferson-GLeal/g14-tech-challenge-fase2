@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public class Restaurant {
 
-    private final UUID id;
+    private UUID id;
     private String name;
     private String cnpj;
     private String type;
@@ -14,6 +14,14 @@ public class Restaurant {
 
     public Restaurant(UUID id, String name, String cnpj, String type, OffsetDateTime lastUpdatedAt, UUID ownerId) {
         this.id = id;
+        this.name = name;
+        this.cnpj = cnpj;
+        this.type = type;
+        this.lastUpdatedAt = lastUpdatedAt;
+        this.ownerId = ownerId;
+    }
+
+    public Restaurant(String name, String cnpj, String type, OffsetDateTime lastUpdatedAt, UUID ownerId) {
         this.name = name;
         this.cnpj = cnpj;
         this.type = type;

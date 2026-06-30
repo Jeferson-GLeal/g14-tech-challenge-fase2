@@ -22,16 +22,22 @@ public class RestaurantPersistenceMapper {
         );
     }
 
-    public static RestaurantJpaEntity toEntity(RestaurantRequest restaurantRequest) {
+    public static RestaurantJpaEntity toEntity(Restaurant restaurant) {
         return new RestaurantJpaEntity(
-                restaurantRequest.name(),
-                restaurantRequest.cnpj(),
-                restaurantRequest.type(),
-                restaurantRequest.ownerId(),
+                restaurant.getName(),
+                restaurant.getCnpj(),
+                restaurant.getType(),
+                restaurant.getOwnerId(),
                 OffsetDateTime.now()
         );
     }
+
+    public static Restaurant fromRequestToDomain(RestaurantRequest restaurantRequest) {
+        return new Restaurant(restaurantRequest.name(),
+                restaurantRequest.cnpj(),
+                restaurantRequest.type(),
+                OffsetDateTime.now(),
+                restaurantRequest.ownerId());
+    }
 }
-
-
 

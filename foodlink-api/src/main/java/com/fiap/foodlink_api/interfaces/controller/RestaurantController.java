@@ -1,9 +1,7 @@
 package com.fiap.foodlink_api.interfaces.controller;
 
-import com.fiap.foodlink_api.application.usecase.address.GetAddressByIdUseCase;
 import com.fiap.foodlink_api.application.usecase.restaurants.*;
 import com.fiap.foodlink_api.application.usecase.user.GetUserByIdUseCase;
-import com.fiap.foodlink_api.application.usecase.user.UpdateUserUseCase;
 import com.fiap.foodlink_api.application.usecase.workingperiod.CreateWorkingPeriodUseCase;
 import com.fiap.foodlink_api.application.usecase.workingperiod.GetWorkingPeriodByIdUseCase;
 import com.fiap.foodlink_api.domain.entity.Restaurant;
@@ -32,7 +30,6 @@ public class RestaurantController {
     private final DeleteRestauranteByIdUseCase deleteRestauranteByIdUseCase;
     private final UpdateRestaurantByIdUseCase updateRestaurantByIdUseCase;
     private final GetUserByIdUseCase getUserByIdUseCase;
-    private final UpdateUserUseCase updateUserUseCase;
     private final GetWorkingPeriodByIdUseCase getWorkingPeriodByIdUseCase;
     private final CreateWorkingPeriodUseCase createWorkingPeriodUseCase;
 
@@ -44,8 +41,7 @@ public class RestaurantController {
             CreateWorkingPeriodUseCase createWorkingPeriodUseCase,
             GetRestaurantByIdUseCase getRestaurantByIdUseCase,
             DeleteRestauranteByIdUseCase deleteRestauranteByIdUseCase,
-            UpdateRestaurantByIdUseCase updateRestaurantByIdUseCase,
-            UpdateUserUseCase updateUserUseCase
+            UpdateRestaurantByIdUseCase updateRestaurantByIdUseCase
     ) {
         this.listRestaurantsUseCase = listRestaurantsUseCase;
         this.getUserByIdUseCase = getUserByIdUseCase;
@@ -55,7 +51,6 @@ public class RestaurantController {
         this.getRestaurantByIdUseCase = getRestaurantByIdUseCase;
         this.deleteRestauranteByIdUseCase = deleteRestauranteByIdUseCase;
         this.updateRestaurantByIdUseCase = updateRestaurantByIdUseCase;
-        this.updateUserUseCase = updateUserUseCase;
     }
 
     @GetMapping
@@ -104,6 +99,8 @@ public class RestaurantController {
     public ResponseEntity<RestaurantResponse> update(@RequestBody RestaurantRequest request, @PathVariable UUID id) {
         Restaurant restaurant = getRestaurantByIdUseCase.execute(id);
         User user = getUserByIdUseCase.execute(restaurant.getOwnerId());
-        updateRestaurantByIdUseCase.execute(request, restaurant, user);
+        List<WorkingPeriod> workingPeriodList = getWorkingPeriodByIdUseCase.execute(restaurant.getId());
+        Restaurant updatedRestaurant = updateRestaurantByIdUseCase.execute(request, restaurant, user);
+        return ResponseEntity.ok(RestaurantControllerMapper.toResponse(updatedRestaurant, user, workingPeriodList));
     }
 }
