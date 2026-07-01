@@ -2,6 +2,8 @@ package com.fiap.foodlink_api.interfaces.controller.handler;
 
 import com.fiap.foodlink_api.domain.exception.DomainException;
 import com.fiap.foodlink_api.domain.exception.AddressNotFoundException;
+import com.fiap.foodlink_api.domain.exception.MenuItemNotFoundException;
+import com.fiap.foodlink_api.domain.exception.RestaurantNotFoundException;
 import com.fiap.foodlink_api.domain.exception.UserAlreadyExistsException;
 import com.fiap.foodlink_api.domain.exception.UserNotFoundException;
 import com.fiap.foodlink_api.domain.exception.UserTypeAlreadyExistsException;
@@ -29,6 +31,16 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(AddressNotFoundException.class)
 	public ResponseEntity<ErrorResponse> handleAddressNotFound(AddressNotFoundException exception) {
+		return buildErrorResponse(exception.getMessage(), HttpStatus.NOT_FOUND);
+	}
+
+	@ExceptionHandler(RestaurantNotFoundException.class)
+	public ResponseEntity<ErrorResponse> handleRestaurantNotFound(RestaurantNotFoundException exception) {
+		return buildErrorResponse(exception.getMessage(), HttpStatus.NOT_FOUND);
+	}
+
+	@ExceptionHandler(MenuItemNotFoundException.class)
+	public ResponseEntity<ErrorResponse> handleMenuItemNotFound(MenuItemNotFoundException exception) {
 		return buildErrorResponse(exception.getMessage(), HttpStatus.NOT_FOUND);
 	}
 
