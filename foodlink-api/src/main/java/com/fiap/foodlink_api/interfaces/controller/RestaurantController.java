@@ -10,6 +10,7 @@ import com.fiap.foodlink_api.domain.entity.WorkingPeriod;
 import com.fiap.foodlink_api.interfaces.controller.dto.RestaurantRequest;
 import com.fiap.foodlink_api.interfaces.controller.dto.RestaurantResponse;
 import com.fiap.foodlink_api.interfaces.controller.mapper.RestaurantControllerMapper;
+import com.fiap.foodlink_api.interfaces.controller.mapper.WorkingPeriodControllerMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
@@ -97,10 +98,10 @@ public class RestaurantController {
     @PutMapping("/{id}")
     @Operation(summary = "Atualiza os dados do restaurante por ID")
     public ResponseEntity<RestaurantResponse> update(@RequestBody RestaurantRequest request, @PathVariable UUID id) {
-        Restaurant restaurant = getRestaurantByIdUseCase.execute(id);
-        User user = getUserByIdUseCase.execute(restaurant.getOwnerId());
-        List<WorkingPeriod> workingPeriodList = getWorkingPeriodByIdUseCase.execute(restaurant.getId());
-        Restaurant updatedRestaurant = updateRestaurantByIdUseCase.execute(request, restaurant, user);
+        User user = getUserByIdUseCase.execute(request.ownerId());
+        List<WorkingPeriod> workingPeriodList = WorkingPeriodControllerMapper.toWorkingPeriod(request.period());
+        Restaurant updatedRestaurant = updateRestaurantByIdUseCase
+                .execute(RestaurantControllerMapper.fromDtoToDomain(request), user, workingPeriodList, id);
         return ResponseEntity.ok(RestaurantControllerMapper.toResponse(updatedRestaurant, user, workingPeriodList));
     }
 }

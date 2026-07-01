@@ -5,6 +5,7 @@ import com.fiap.foodlink_api.domain.gateway.WorkingPeriodGateway;
 import com.fiap.foodlink_api.infrastructure.persistence.entity.WorkingPeriodJpaEntity;
 import com.fiap.foodlink_api.infrastructure.persistence.mapper.WorkingPeriodPersistenceMapper;
 import com.fiap.foodlink_api.infrastructure.persistence.repository.WorkingPeriodJpaRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -34,7 +35,21 @@ public class WorkingPeriodDatabaseGateway implements WorkingPeriodGateway {
     }
 
     @Override
+    @Transactional
     public WorkingPeriod save(WorkingPeriodJpaEntity workingPeriod) {
         return WorkingPeriodPersistenceMapper.toDomain(workingPeriodJpaRepository.save(workingPeriod));
+    }
+
+    @Override
+    public List<WorkingPeriod> findByRestaurantId(UUID id) {
+        return workingPeriodJpaRepository.findByRestaurantId(id)
+                .stream()
+                .map(WorkingPeriodPersistenceMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteAll(UUID id) {
+        workingPeriodJpaRepository.deleteAllByRestaurantId(id);
     }
 }

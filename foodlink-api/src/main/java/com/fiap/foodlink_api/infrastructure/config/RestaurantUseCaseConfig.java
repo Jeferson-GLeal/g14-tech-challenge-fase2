@@ -2,6 +2,7 @@ package com.fiap.foodlink_api.infrastructure.config;
 
 import com.fiap.foodlink_api.application.usecase.restaurants.*;
 import com.fiap.foodlink_api.domain.gateway.RestaurantGateway;
+import com.fiap.foodlink_api.domain.gateway.WorkingPeriodGateway;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,7 +30,7 @@ public class RestaurantUseCaseConfig {
     }
 
     @Bean
-    public UpdateRestaurantByIdUseCase updateRestaurantByIdUseCase(RestaurantGateway restaurantGateway) {
-        return new UpdateRestaurantByIdUseCase(restaurantGateway);
+    public UpdateRestaurantByIdUseCase updateRestaurantByIdUseCase(RestaurantGateway restaurantGateway, WorkingPeriodGateway workingPeriodGateway) {
+        return new UpdateRestaurantByIdUseCase(restaurantGateway, workingPeriodGateway);
     }
 }

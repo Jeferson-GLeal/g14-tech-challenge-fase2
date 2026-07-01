@@ -4,6 +4,7 @@ import com.fiap.foodlink_api.domain.entity.Restaurant;
 import com.fiap.foodlink_api.domain.gateway.RestaurantGateway;
 import com.fiap.foodlink_api.infrastructure.persistence.mapper.RestaurantPersistenceMapper;
 import com.fiap.foodlink_api.infrastructure.persistence.repository.RestaurantJpaRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -27,6 +28,7 @@ public class RestaurantDatabaseGateway implements RestaurantGateway {
     }
 
     @Override
+    @Transactional
     public Restaurant save(Restaurant restaurant) {
         return RestaurantPersistenceMapper.toDomain(
                 restaurantJpaRepository.save(RestaurantPersistenceMapper.toEntity(restaurant)));
@@ -48,6 +50,7 @@ public class RestaurantDatabaseGateway implements RestaurantGateway {
     }
 
     @Override
+    @Transactional
     public void deleteById(UUID id) {
         restaurantJpaRepository.deleteById(id);
     }

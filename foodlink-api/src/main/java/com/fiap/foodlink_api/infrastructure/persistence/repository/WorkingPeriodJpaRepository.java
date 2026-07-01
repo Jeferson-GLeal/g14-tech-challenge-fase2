@@ -15,4 +15,7 @@ public interface WorkingPeriodJpaRepository extends JpaRepository<WorkingPeriodJ
     List<WorkingPeriodJpaEntity> findByRestaurantId(UUID restaurantId);
 
     boolean existsByRestaurantId(UUID restaurantId);
+
+    @Query("DELETE FROM WorkingPeriodJpaEntity wp WHERE wp.restaurantId = :restaurantId")
+    void deleteAllByRestaurantId(UUID restaurantId);
 }

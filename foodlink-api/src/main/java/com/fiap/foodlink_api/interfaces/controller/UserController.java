@@ -21,7 +21,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -73,7 +72,6 @@ public class UserController {
 	}
 
 	@PostMapping
-	@Transactional
 	@Operation(summary = "Cria um usuario com endereco")
 	public ResponseEntity<UserResponse> create(@RequestBody UserRequest request) {
 		Address address = createAddress(request.address());
@@ -112,7 +110,6 @@ public class UserController {
 	}
 
 	@PutMapping("/{id}")
-	@Transactional
 	@Operation(summary = "Atualiza um usuario com endereco")
 	public ResponseEntity<UserResponse> update(@PathVariable UUID id, @RequestBody UserRequest request) {
 		User currentUser = getUserByIdUseCase.execute(id);

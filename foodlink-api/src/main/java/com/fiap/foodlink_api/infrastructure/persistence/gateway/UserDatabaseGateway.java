@@ -4,6 +4,7 @@ import com.fiap.foodlink_api.domain.entity.User;
 import com.fiap.foodlink_api.domain.gateway.UserGateway;
 import com.fiap.foodlink_api.infrastructure.persistence.mapper.UserPersistenceMapper;
 import com.fiap.foodlink_api.infrastructure.persistence.repository.UserJpaRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class UserDatabaseGateway implements UserGateway {
 	}
 
 	@Override
+	@Transactional
 	public User save(User user) {
 		return UserPersistenceMapper.toDomain(
 				userJpaRepository.save(UserPersistenceMapper.toEntity(user))
@@ -67,6 +69,7 @@ public class UserDatabaseGateway implements UserGateway {
 	}
 
 	@Override
+	@Transactional
 	public void deleteById(UUID id) {
 		userJpaRepository.deleteById(id);
 	}

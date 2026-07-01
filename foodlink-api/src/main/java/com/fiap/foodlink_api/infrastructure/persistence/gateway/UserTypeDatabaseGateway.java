@@ -4,6 +4,7 @@ import com.fiap.foodlink_api.domain.entity.UserType;
 import com.fiap.foodlink_api.domain.gateway.UserTypeGateway;
 import com.fiap.foodlink_api.infrastructure.persistence.mapper.UserTypePersistenceMapper;
 import com.fiap.foodlink_api.infrastructure.persistence.repository.UserTypeJpaRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class UserTypeDatabaseGateway implements UserTypeGateway {
 	}
 
 	@Override
+	@Transactional
 	public UserType save(UserType userType) {
 		return UserTypePersistenceMapper.toDomain(
 				userTypeJpaRepository.save(UserTypePersistenceMapper.toEntity(userType))
@@ -56,6 +58,7 @@ public class UserTypeDatabaseGateway implements UserTypeGateway {
 	}
 
 	@Override
+	@Transactional
 	public void deleteById(UUID id) {
 		userTypeJpaRepository.deleteById(id);
 	}
