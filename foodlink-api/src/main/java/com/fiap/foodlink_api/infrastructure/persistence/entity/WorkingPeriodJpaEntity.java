@@ -4,7 +4,6 @@ import com.fiap.foodlink_api.infrastructure.persistence.enums.DaysOfWeekEnum;
 import jakarta.persistence.*;
 
 import java.time.LocalTime;
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
@@ -12,12 +11,13 @@ import java.util.UUID;
 public class WorkingPeriodJpaEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private UUID id;
 
-    @Column(name = "restaurant_id", nullable = false)
+    @Column(name = "restaurante_id", nullable = false)
     private UUID restaurantId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "dias_semana", nullable = false)
     private DaysOfWeekEnum day;
 
@@ -26,6 +26,9 @@ public class WorkingPeriodJpaEntity {
 
     @Column(name = "hora_encerramento", nullable = false)
     private LocalTime closeTime;
+
+    protected WorkingPeriodJpaEntity() {
+    }
 
     public WorkingPeriodJpaEntity(UUID id, UUID restaurantId, DaysOfWeekEnum day, LocalTime openTime, LocalTime closeTime) {
         this.id = id;

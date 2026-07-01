@@ -10,7 +10,7 @@ import java.util.UUID;
 public class RestaurantJpaEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private UUID id;
 
     @Column(name = "nome", nullable = false)
@@ -22,11 +22,16 @@ public class RestaurantJpaEntity {
     @Column(name = "tipo_cozinha", nullable = false)
     private String type;
 
-    @Column(name = "dono_reataurante_id")
+    @Column(name = "dono_restaurante_id", nullable = false)
     private UUID owner;
 
     @Column(name = "data_ultima_alteracao", nullable = false)
     private OffsetDateTime lastUpdatedAt;
+
+
+
+    protected RestaurantJpaEntity() {
+    }
 
     public RestaurantJpaEntity(UUID id, String name, String cnpj, String type, UUID owner, OffsetDateTime lastUpdatedAt) {
         this.id = id;

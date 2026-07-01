@@ -50,4 +50,10 @@ public class UserType {
 	private String normalizeName(String name) {
 		return Objects.requireNonNullElse(name, "").trim();
 	}
+
+	public void isDono(){
+		if( !this.name.equals("Dono") ) {
+			throw new DomainException("Usuario nao e dono do restaurante.");
+		}
+	}
 }
