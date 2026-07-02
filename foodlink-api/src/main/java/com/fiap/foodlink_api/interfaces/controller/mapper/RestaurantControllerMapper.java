@@ -3,10 +3,12 @@ package com.fiap.foodlink_api.interfaces.controller.mapper;
 import com.fiap.foodlink_api.domain.entity.Restaurant;
 import com.fiap.foodlink_api.domain.entity.User;
 import com.fiap.foodlink_api.domain.entity.WorkingPeriod;
+import com.fiap.foodlink_api.interfaces.controller.dto.RestaurantRequest;
 import com.fiap.foodlink_api.interfaces.controller.dto.RestaurantResponse;
 import com.fiap.foodlink_api.interfaces.controller.dto.UserResponse;
 import com.fiap.foodlink_api.interfaces.controller.dto.WorkingPeriodResponse;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +20,7 @@ public class RestaurantControllerMapper {
     public static RestaurantResponse toResponse(Restaurant restaurant, User owner, List<WorkingPeriod> workingPeriod) {
         List<WorkingPeriodResponse> workingPeriodResponses = new ArrayList<>();
         workingPeriod.forEach(wp -> {
-            workingPeriodResponses.add(toWorkingPeriodResponse(wp));
+            workingPeriodResponses.add(WorkingPeriodControllerMapper.toWorkingPeriodResponse(wp));
         });
         return new RestaurantResponse(
                 restaurant.getId(),
@@ -49,5 +51,14 @@ public class RestaurantControllerMapper {
                 workingPeriod.getOpenTime(),
                 workingPeriod.getCloseTime()
         );
+    }
+
+    public static Restaurant fromDtoToDomain(RestaurantRequest request){
+        return new Restaurant(
+                request.name(),
+                request.cnpj(),
+                request.type(),
+                OffsetDateTime.now(),
+                request.ownerId());
     }
 }

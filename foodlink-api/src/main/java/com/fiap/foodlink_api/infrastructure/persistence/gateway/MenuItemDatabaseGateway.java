@@ -4,6 +4,7 @@ import com.fiap.foodlink_api.domain.entity.MenuItem;
 import com.fiap.foodlink_api.domain.gateway.MenuItemGateway;
 import com.fiap.foodlink_api.infrastructure.persistence.mapper.MenuItemPersistenceMapper;
 import com.fiap.foodlink_api.infrastructure.persistence.repository.MenuItemJpaRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class MenuItemDatabaseGateway implements MenuItemGateway {
 	}
 
 	@Override
+	@Transactional
 	public MenuItem save(MenuItem menuItem) {
 		return MenuItemPersistenceMapper.toDomain(
 				menuItemJpaRepository.save(MenuItemPersistenceMapper.toEntity(menuItem))
@@ -52,6 +54,7 @@ public class MenuItemDatabaseGateway implements MenuItemGateway {
 	}
 
 	@Override
+	@Transactional
 	public void deleteById(UUID id) {
 		menuItemJpaRepository.deleteById(id);
 	}

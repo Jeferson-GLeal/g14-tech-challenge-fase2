@@ -11,4 +11,9 @@ public interface WorkingPeriodGateway {
     boolean existsByRestaurantId(UUID restaurantId);
     List<WorkingPeriod> findWorkingPeriodByRestaurantId(UUID restaurantId);
     WorkingPeriod save(WorkingPeriodJpaEntity workingPeriod);
+
+    List<WorkingPeriod> findByRestaurantId(UUID id);
+
+    void deleteAll(UUID id);
+
 }

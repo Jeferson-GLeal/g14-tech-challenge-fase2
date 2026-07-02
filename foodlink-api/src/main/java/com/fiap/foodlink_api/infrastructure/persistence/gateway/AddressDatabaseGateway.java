@@ -4,6 +4,7 @@ import com.fiap.foodlink_api.domain.entity.Address;
 import com.fiap.foodlink_api.domain.gateway.AddressGateway;
 import com.fiap.foodlink_api.infrastructure.persistence.mapper.AddressPersistenceMapper;
 import com.fiap.foodlink_api.infrastructure.persistence.repository.AddressJpaRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class AddressDatabaseGateway implements AddressGateway {
 	}
 
 	@Override
+	@Transactional
 	public Address save(Address address) {
 		return AddressPersistenceMapper.toDomain(
 				addressJpaRepository.save(AddressPersistenceMapper.toEntity(address))
@@ -45,6 +47,7 @@ public class AddressDatabaseGateway implements AddressGateway {
 	}
 
 	@Override
+	@Transactional
 	public void deleteById(UUID id) {
 		addressJpaRepository.deleteById(id);
 	}

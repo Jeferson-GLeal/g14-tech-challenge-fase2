@@ -29,6 +29,15 @@ public class Restaurant {
         this.ownerId = ownerId;
     }
 
+    public Restaurant update(String name, String cnpj, String type, UUID ownerId){
+        setName(name);
+        setCnpj(cnpj);
+        setType(type);
+        setOwnerId(ownerId);
+        setLastUpdatedAt(OffsetDateTime.now());
+        return this;
+    }
+
     public UUID getId() {
         return id;
     }
@@ -37,7 +46,7 @@ public class Restaurant {
         return name;
     }
 
-    public void setName(String name) {
+    private void setName(String name) {
         this.name = name;
     }
 
@@ -45,7 +54,7 @@ public class Restaurant {
         return cnpj;
     }
 
-    public void setCnpj(String cnpj) {
+    private void setCnpj(String cnpj) {
         this.cnpj = cnpj;
     }
 
@@ -53,7 +62,7 @@ public class Restaurant {
         return type;
     }
 
-    public void setType(String type) {
+    private void setType(String type) {
         this.type = type;
     }
 
@@ -61,7 +70,7 @@ public class Restaurant {
         return lastUpdatedAt;
     }
 
-    public void setLastUpdatedAt(OffsetDateTime lastUpdatedAt) {
+    private void setLastUpdatedAt(OffsetDateTime lastUpdatedAt) {
         this.lastUpdatedAt = lastUpdatedAt;
     }
 
@@ -69,7 +78,7 @@ public class Restaurant {
         return ownerId;
     }
 
-    public void setOwnerId(UUID ownerId) {
+    private void setOwnerId(UUID ownerId) {
         this.ownerId = ownerId;
     }
 }

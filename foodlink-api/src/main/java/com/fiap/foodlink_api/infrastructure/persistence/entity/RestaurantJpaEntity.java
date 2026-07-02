@@ -3,6 +3,7 @@ package com.fiap.foodlink_api.infrastructure.persistence.entity;
 import jakarta.persistence.*;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -28,18 +29,21 @@ public class RestaurantJpaEntity {
     @Column(name = "data_ultima_alteracao", nullable = false)
     private OffsetDateTime lastUpdatedAt;
 
-
+    @OneToMany
+    @JoinColumn(name = "restaurante_id")
+    private List<WorkingPeriodJpaEntity> workingPeriods;
 
     protected RestaurantJpaEntity() {
     }
 
-    public RestaurantJpaEntity(UUID id, String name, String cnpj, String type, UUID owner, OffsetDateTime lastUpdatedAt) {
+    public RestaurantJpaEntity(UUID id, String name, String cnpj, String type, UUID owner, OffsetDateTime lastUpdatedAt, List<WorkingPeriodJpaEntity> workingPeriods) {
         this.id = id;
         this.name = name;
         this.cnpj = cnpj;
         this.type = type;
         this.owner = owner;
         this.lastUpdatedAt = lastUpdatedAt;
+        this.workingPeriods = workingPeriods;
     }
 
     public RestaurantJpaEntity(String name, String cnpj, String type, UUID owner, OffsetDateTime lastUpdatedAt) {
@@ -96,5 +100,13 @@ public class RestaurantJpaEntity {
 
     public void setLastUpdatedAt(OffsetDateTime lastUpdatedAt) {
         this.lastUpdatedAt = lastUpdatedAt;
+    }
+
+    public List<WorkingPeriodJpaEntity> getWorkingPeriods() {
+        return workingPeriods;
+    }
+
+    public void setWorkingPeriods(List<WorkingPeriodJpaEntity> workingPeriods) {
+        this.workingPeriods = workingPeriods;
     }
 }
