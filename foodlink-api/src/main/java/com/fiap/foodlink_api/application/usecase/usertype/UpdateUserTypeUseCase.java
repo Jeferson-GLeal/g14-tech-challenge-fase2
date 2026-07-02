@@ -1,6 +1,7 @@
 package com.fiap.foodlink_api.application.usecase.usertype;
 
 import com.fiap.foodlink_api.domain.entity.UserType;
+import com.fiap.foodlink_api.domain.entity.UserTypeCode;
 import com.fiap.foodlink_api.domain.exception.UserTypeAlreadyExistsException;
 import com.fiap.foodlink_api.domain.exception.UserTypeNotFoundException;
 import com.fiap.foodlink_api.domain.gateway.UserTypeGateway;
@@ -16,11 +17,11 @@ public class UpdateUserTypeUseCase {
 		this.userTypeGateway = userTypeGateway;
 	}
 
-	public UserType execute(UUID id, String name) {
+	public UserType execute(UUID id, String name, UserTypeCode code) {
 		UserType userType = userTypeGateway.findById(id)
 				.orElseThrow(() -> new UserTypeNotFoundException(id));
 
-		userType.rename(name);
+		userType.update(name, code);
 		validateUniqueName(userType);
 
 		return userTypeGateway.save(userType);

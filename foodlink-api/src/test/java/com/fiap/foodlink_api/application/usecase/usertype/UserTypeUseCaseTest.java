@@ -1,6 +1,7 @@
 package com.fiap.foodlink_api.application.usecase.usertype;
 
 import com.fiap.foodlink_api.domain.entity.UserType;
+import com.fiap.foodlink_api.domain.entity.UserTypeCode;
 import com.fiap.foodlink_api.domain.exception.UserTypeAlreadyExistsException;
 import com.fiap.foodlink_api.domain.exception.UserTypeNotFoundException;
 import com.fiap.foodlink_api.domain.gateway.UserTypeGateway;
@@ -30,10 +31,10 @@ class UserTypeUseCaseTest {
 		UserTypeGateway gateway = mock(UserTypeGateway.class);
 		UUID id = UUID.randomUUID();
 		when(gateway.existsByName("Cliente")).thenReturn(false);
-		when(gateway.save(any(UserType.class))).thenReturn(new UserType(id, "Cliente"));
+		when(gateway.save(any(UserType.class))).thenReturn(new UserType(id, "Cliente", UserTypeCode.CLIENTE));
 		CreateUserTypeUseCase useCase = new CreateUserTypeUseCase(gateway);
 
-		UserType userType = useCase.execute("Cliente");
+		UserType userType = useCase.execute("Cliente", UserTypeCode.CLIENTE);
 
 		assertEquals(id, userType.getId());
 		assertEquals("Cliente", userType.getName());
@@ -49,7 +50,7 @@ class UserTypeUseCaseTest {
 		when(gateway.save(any(UserType.class))).thenAnswer(invocation -> invocation.getArgument(0));
 		CreateUserTypeUseCase useCase = new CreateUserTypeUseCase(gateway);
 
-		UserType userType = useCase.execute("  Cliente  ");
+		UserType userType = useCase.execute("  Cliente  ", UserTypeCode.CLIENTE);
 
 		assertNull(userType.getId());
 		assertEquals("Cliente", userType.getName());
@@ -65,7 +66,7 @@ class UserTypeUseCaseTest {
 
 		UserTypeAlreadyExistsException exception = assertThrows(
 				UserTypeAlreadyExistsException.class,
-				() -> useCase.execute("Cliente")
+				() -> useCase.execute("Cliente", UserTypeCode.CLIENTE)
 		);
 
 		assertEquals("Tipo de usuario ja cadastrado: Cliente", exception.getMessage());
@@ -78,7 +79,7 @@ class UserTypeUseCaseTest {
 	void deveBuscarTipoUsuarioPorIdentificador() {
 		UserTypeGateway gateway = mock(UserTypeGateway.class);
 		UUID id = UUID.randomUUID();
-		UserType savedUserType = new UserType(id, "Cliente");
+		UserType savedUserType = new UserType(id, "Cliente", UserTypeCode.CLIENTE);
 		when(gateway.findById(id)).thenReturn(Optional.of(savedUserType));
 		GetUserTypeByIdUseCase useCase = new GetUserTypeByIdUseCase(gateway);
 
@@ -111,8 +112,8 @@ class UserTypeUseCaseTest {
 	void deveListarTiposUsuarioCadastrados() {
 		UserTypeGateway gateway = mock(UserTypeGateway.class);
 		List<UserType> savedUserTypes = List.of(
-				new UserType(UUID.randomUUID(), "Cliente"),
-				new UserType(UUID.randomUUID(), "Dono de Restaurante")
+				new UserType(UUID.randomUUID(), "Cliente", UserTypeCode.CLIENTE),
+				new UserType(UUID.randomUUID(), "Dono de Restaurante", UserTypeCode.DONO_RESTAURANTE)
 		);
 		when(gateway.findAll()).thenReturn(savedUserTypes);
 		ListUserTypesUseCase useCase = new ListUserTypesUseCase(gateway);
@@ -130,13 +131,13 @@ class UserTypeUseCaseTest {
 	void deveAtualizarNomeDoTipoUsuario() {
 		UserTypeGateway gateway = mock(UserTypeGateway.class);
 		UUID id = UUID.randomUUID();
-		UserType savedUserType = new UserType(id, "Cliente");
+		UserType savedUserType = new UserType(id, "Cliente", UserTypeCode.CLIENTE);
 		when(gateway.findById(id)).thenReturn(Optional.of(savedUserType));
 		when(gateway.findByName("Dono de Restaurante")).thenReturn(Optional.empty());
 		when(gateway.save(any(UserType.class))).thenAnswer(invocation -> invocation.getArgument(0));
 		UpdateUserTypeUseCase useCase = new UpdateUserTypeUseCase(gateway);
 
-		UserType userType = useCase.execute(id, "Dono de Restaurante");
+		UserType userType = useCase.execute(id, "Dono de Restaurante", UserTypeCode.DONO_RESTAURANTE);
 
 		assertEquals(id, userType.getId());
 		assertEquals("Dono de Restaurante", userType.getName());
@@ -150,14 +151,14 @@ class UserTypeUseCaseTest {
 	void deveEnviarTipoUsuarioAtualizadoParaPersistencia() {
 		UserTypeGateway gateway = mock(UserTypeGateway.class);
 		UUID id = UUID.randomUUID();
-		UserType savedUserType = new UserType(id, "Cliente");
+		UserType savedUserType = new UserType(id, "Cliente", UserTypeCode.CLIENTE);
 		when(gateway.findById(id)).thenReturn(Optional.of(savedUserType));
 		when(gateway.findByName("Dono de Restaurante")).thenReturn(Optional.empty());
 		when(gateway.save(any(UserType.class))).thenAnswer(invocation -> invocation.getArgument(0));
 		UpdateUserTypeUseCase useCase = new UpdateUserTypeUseCase(gateway);
 		ArgumentCaptor<UserType> captor = ArgumentCaptor.forClass(UserType.class);
 
-		useCase.execute(id, "Dono de Restaurante");
+		useCase.execute(id, "Dono de Restaurante", UserTypeCode.DONO_RESTAURANTE);
 
 		verify(gateway).save(captor.capture());
 		assertEquals(id, captor.getValue().getId());
@@ -174,7 +175,7 @@ class UserTypeUseCaseTest {
 
 		UserTypeNotFoundException exception = assertThrows(
 				UserTypeNotFoundException.class,
-				() -> useCase.execute(id, "Cliente")
+				() -> useCase.execute(id, "Cliente", UserTypeCode.CLIENTE)
 		);
 
 		assertEquals("Tipo de usuario nao encontrado: " + id, exception.getMessage());
@@ -188,15 +189,15 @@ class UserTypeUseCaseTest {
 		UserTypeGateway gateway = mock(UserTypeGateway.class);
 		UUID clienteId = UUID.randomUUID();
 		UUID donoId = UUID.randomUUID();
-		UserType cliente = new UserType(clienteId, "Cliente");
-		UserType dono = new UserType(donoId, "Dono de Restaurante");
+		UserType cliente = new UserType(clienteId, "Cliente", UserTypeCode.CLIENTE);
+		UserType dono = new UserType(donoId, "Dono de Restaurante", UserTypeCode.DONO_RESTAURANTE);
 		when(gateway.findById(clienteId)).thenReturn(Optional.of(cliente));
 		when(gateway.findByName("Dono de Restaurante")).thenReturn(Optional.of(dono));
 		UpdateUserTypeUseCase useCase = new UpdateUserTypeUseCase(gateway);
 
 		UserTypeAlreadyExistsException exception = assertThrows(
 				UserTypeAlreadyExistsException.class,
-				() -> useCase.execute(clienteId, "Dono de Restaurante")
+				() -> useCase.execute(clienteId, "Dono de Restaurante", UserTypeCode.DONO_RESTAURANTE)
 		);
 
 		assertEquals("Tipo de usuario ja cadastrado: Dono de Restaurante", exception.getMessage());

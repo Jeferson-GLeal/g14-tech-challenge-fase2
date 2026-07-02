@@ -1,7 +1,7 @@
-INSERT INTO tipos_usuario (id, nome)
+INSERT INTO tipos_usuario (id, nome, codigo)
 VALUES
-    ('11111111-1111-1111-1111-111111111111', 'Dono de Restaurante'),
-    ('22222222-2222-2222-2222-222222222222', 'Cliente')
+    ('11111111-1111-1111-1111-111111111111', 'Dono de Restaurante', 'DONO_RESTAURANTE'),
+    ('22222222-2222-2222-2222-222222222222', 'Cliente', 'CLIENTE')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO enderecos (

@@ -1,4 +1,6 @@
 package com.fiap.foodlink_api.interfaces.controller.dto;
 
-public record UserTypeRequest(String name) {
+import com.fiap.foodlink_api.domain.entity.UserTypeCode;
+
+public record UserTypeRequest(String name, UserTypeCode code) {
 }

@@ -9,6 +9,6 @@ public class UserTypeControllerMapper {
 	}
 
 	public static UserTypeResponse toResponse(UserType userType) {
-		return new UserTypeResponse(userType.getId(), userType.getName());
+		return new UserTypeResponse(userType.getId(), userType.getName(), userType.getCode());
 	}
 }
