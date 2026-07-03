@@ -1,12 +1,17 @@
 package com.fiap.foodlink_api.interfaces.controller;
 
 import com.fiap.foodlink_api.application.usecase.restaurants.*;
+import com.fiap.foodlink_api.application.usecase.address.CreateAddressUseCase;
+import com.fiap.foodlink_api.application.usecase.address.GetAddressByIdUseCase;
 import com.fiap.foodlink_api.application.usecase.user.GetUserByIdUseCase;
 import com.fiap.foodlink_api.application.usecase.workingperiod.CreateWorkingPeriodUseCase;
 import com.fiap.foodlink_api.application.usecase.workingperiod.GetWorkingPeriodByIdUseCase;
+import com.fiap.foodlink_api.domain.entity.Address;
 import com.fiap.foodlink_api.domain.entity.Restaurant;
 import com.fiap.foodlink_api.domain.entity.User;
 import com.fiap.foodlink_api.domain.entity.WorkingPeriod;
+import com.fiap.foodlink_api.domain.exception.DomainException;
+import com.fiap.foodlink_api.interfaces.controller.dto.AddressRequest;
 import com.fiap.foodlink_api.interfaces.controller.dto.RestaurantRequest;
 import com.fiap.foodlink_api.interfaces.controller.dto.RestaurantResponse;
 import com.fiap.foodlink_api.interfaces.controller.mapper.RestaurantControllerMapper;
@@ -33,6 +38,8 @@ public class RestaurantController {
     private final GetUserByIdUseCase getUserByIdUseCase;
     private final GetWorkingPeriodByIdUseCase getWorkingPeriodByIdUseCase;
     private final CreateWorkingPeriodUseCase createWorkingPeriodUseCase;
+    private final CreateAddressUseCase createAddressUseCase;
+    private final GetAddressByIdUseCase getAddressByIdUseCase;
 
     public RestaurantController(
             ListRestaurantsUseCase listRestaurantsUseCase,
@@ -40,6 +47,8 @@ public class RestaurantController {
             GetWorkingPeriodByIdUseCase getWorkingPeriodByIdUseCase,
             CreateRestaurantUseCase createRestaurantUseCase,
             CreateWorkingPeriodUseCase createWorkingPeriodUseCase,
+            CreateAddressUseCase createAddressUseCase,
+            GetAddressByIdUseCase getAddressByIdUseCase,
             GetRestaurantByIdUseCase getRestaurantByIdUseCase,
             DeleteRestauranteByIdUseCase deleteRestauranteByIdUseCase,
             UpdateRestaurantByIdUseCase updateRestaurantByIdUseCase
@@ -49,6 +58,8 @@ public class RestaurantController {
         this.getWorkingPeriodByIdUseCase = getWorkingPeriodByIdUseCase;
         this.createRestaurantUseCase = createRestaurantUseCase;
         this.createWorkingPeriodUseCase = createWorkingPeriodUseCase;
+        this.createAddressUseCase = createAddressUseCase;
+        this.getAddressByIdUseCase = getAddressByIdUseCase;
         this.getRestaurantByIdUseCase = getRestaurantByIdUseCase;
         this.deleteRestauranteByIdUseCase = deleteRestauranteByIdUseCase;
         this.updateRestaurantByIdUseCase = updateRestaurantByIdUseCase;
@@ -61,6 +72,7 @@ public class RestaurantController {
                 restaurant -> RestaurantControllerMapper.toResponse(
                         restaurant,
                         getUserByIdUseCase.execute(restaurant.getOwnerId()),
+                        getAddressByIdUseCase.execute(restaurant.getAddressId()),
                         getWorkingPeriodByIdUseCase.execute(restaurant.getId())
                 )
         ).toList();
@@ -74,6 +86,7 @@ public class RestaurantController {
         RestaurantResponse restaurantResponse = RestaurantControllerMapper.toResponse(
                 restaurant,
                 getUserByIdUseCase.execute(restaurant.getOwnerId()),
+                getAddressByIdUseCase.execute(restaurant.getAddressId()),
                 getWorkingPeriodByIdUseCase.execute(restaurant.getId())
         );
         return ResponseEntity.ok(restaurantResponse);
@@ -82,10 +95,22 @@ public class RestaurantController {
     @PostMapping
     @Operation(summary = "Cria um novo restaurante com horário de funcionamento e dono")
     public ResponseEntity<RestaurantResponse> create(@RequestBody RestaurantRequest request){
-        Restaurant restaurantResponse = createRestaurantUseCase.execute(request);
-        List<WorkingPeriod> workingPeriodList= createWorkingPeriodUseCase.execute(request.period(), restaurantResponse.getId());
+        Address address = createAddress(request.address());
+        Restaurant restaurant = createRestaurantUseCase.execute(
+                request.name(),
+                request.cnpj(),
+                request.type(),
+                request.ownerId(),
+                address.getId()
+        );
+        List<WorkingPeriod> workingPeriodList = createWorkingPeriodUseCase.execute(request.period(), restaurant.getId());
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(RestaurantControllerMapper.toResponse(restaurantResponse, getUserByIdUseCase.execute(restaurantResponse.getOwnerId()), workingPeriodList));
+                .body(RestaurantControllerMapper.toResponse(
+                        restaurant,
+                        getUserByIdUseCase.execute(restaurant.getOwnerId()),
+                        address,
+                        workingPeriodList
+                ));
     }
 
     @DeleteMapping("/{id}")
@@ -98,10 +123,33 @@ public class RestaurantController {
     @PutMapping("/{id}")
     @Operation(summary = "Atualiza os dados do restaurante por ID")
     public ResponseEntity<RestaurantResponse> update(@RequestBody RestaurantRequest request, @PathVariable UUID id) {
-        User user = getUserByIdUseCase.execute(request.ownerId());
         List<WorkingPeriod> workingPeriodList = WorkingPeriodControllerMapper.toWorkingPeriod(request.period());
-        Restaurant updatedRestaurant = updateRestaurantByIdUseCase
-                .execute(RestaurantControllerMapper.fromDtoToDomain(request), user, workingPeriodList, id);
-        return ResponseEntity.ok(RestaurantControllerMapper.toResponse(updatedRestaurant, user, workingPeriodList));
+        Restaurant updatedRestaurant = updateRestaurantByIdUseCase.execute(
+                id,
+                request.name(),
+                request.cnpj(),
+                request.type(),
+                request.ownerId(),
+                workingPeriodList
+        );
+        User owner = getUserByIdUseCase.execute(updatedRestaurant.getOwnerId());
+        Address address = getAddressByIdUseCase.execute(updatedRestaurant.getAddressId());
+        return ResponseEntity.ok(RestaurantControllerMapper.toResponse(updatedRestaurant, owner, address, workingPeriodList));
+    }
+
+    private Address createAddress(AddressRequest request) {
+        if (request == null) {
+            throw new DomainException("Endereco do restaurante e obrigatorio.");
+        }
+
+        return createAddressUseCase.execute(
+                request.street(),
+                request.number(),
+                request.complement(),
+                request.district(),
+                request.city(),
+                request.state(),
+                request.zipCode()
+        );
     }
 }

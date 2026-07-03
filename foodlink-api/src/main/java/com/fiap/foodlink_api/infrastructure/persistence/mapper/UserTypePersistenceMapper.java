@@ -8,10 +8,10 @@ public class UserTypePersistenceMapper {
 	private UserTypePersistenceMapper() {}
 
 	public static UserType toDomain(UserTypeJpaEntity entity) {
-		return new UserType(entity.getId(), entity.getName());
+		return new UserType(entity.getId(), entity.getName(), entity.getCode());
 	}
 
 	public static UserTypeJpaEntity toEntity(UserType userType) {
-		return new UserTypeJpaEntity(userType.getId(), userType.getName());
+		return new UserTypeJpaEntity(userType.getId(), userType.getName(), userType.getCode());
 	}
 }

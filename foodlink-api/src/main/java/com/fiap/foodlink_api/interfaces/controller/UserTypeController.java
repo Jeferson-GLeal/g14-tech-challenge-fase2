@@ -53,7 +53,7 @@ public class UserTypeController {
 	@PostMapping
 	@Operation(summary = "Cria um tipo de usuario")
 	public ResponseEntity<UserTypeResponse> create(@RequestBody UserTypeRequest request) {
-		UserType userType = createUserTypeUseCase.execute(request.name());
+		UserType userType = createUserTypeUseCase.execute(request.name(), request.code());
 		return ResponseEntity.status(HttpStatus.CREATED)
 				.body(UserTypeControllerMapper.toResponse(userType));
 	}
@@ -77,7 +77,7 @@ public class UserTypeController {
 	@PutMapping("/{id}")
 	@Operation(summary = "Atualiza um tipo de usuario")
 	public ResponseEntity<UserTypeResponse> update(@PathVariable UUID id, @RequestBody UserTypeRequest request) {
-		UserType userType = updateUserTypeUseCase.execute(id, request.name());
+		UserType userType = updateUserTypeUseCase.execute(id, request.name(), request.code());
 		return ResponseEntity.ok(UserTypeControllerMapper.toResponse(userType));
 	}
 

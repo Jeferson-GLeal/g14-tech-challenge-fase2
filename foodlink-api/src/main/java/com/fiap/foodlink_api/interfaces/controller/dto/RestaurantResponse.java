@@ -8,7 +8,9 @@ public record RestaurantResponse (UUID id,
                                   String name,
                                   String cnpj,
                                   String type,
-                                  UserResponse owner,
+                                  UUID ownerId,
+                                  String ownerName,
+                                  AddressResponse address,
                                   OffsetDateTime lastUpdatedAt,
                                   List<WorkingPeriodResponse> period){
 }

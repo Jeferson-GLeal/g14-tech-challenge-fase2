@@ -6,6 +6,7 @@ import com.fiap.foodlink_api.application.usecase.usertype.GetUserTypeByIdUseCase
 import com.fiap.foodlink_api.application.usecase.usertype.ListUserTypesUseCase;
 import com.fiap.foodlink_api.application.usecase.usertype.UpdateUserTypeUseCase;
 import com.fiap.foodlink_api.domain.entity.UserType;
+import com.fiap.foodlink_api.domain.entity.UserTypeCode;
 import com.fiap.foodlink_api.interfaces.controller.dto.UserTypeRequest;
 import com.fiap.foodlink_api.interfaces.controller.dto.UserTypeResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -32,15 +33,16 @@ class UserTypeControllerTest {
 		CreateUserTypeUseCase createUserTypeUseCase = mock(CreateUserTypeUseCase.class);
 		UserTypeController controller = criarController(createUserTypeUseCase);
 		UUID id = UUID.randomUUID();
-		when(createUserTypeUseCase.execute("Cliente")).thenReturn(new UserType(id, "Cliente"));
+		when(createUserTypeUseCase.execute("Cliente", UserTypeCode.CLIENTE))
+				.thenReturn(new UserType(id, "Cliente", UserTypeCode.CLIENTE));
 
-		ResponseEntity<UserTypeResponse> response = controller.create(new UserTypeRequest("Cliente"));
+		ResponseEntity<UserTypeResponse> response = controller.create(new UserTypeRequest("Cliente", UserTypeCode.CLIENTE));
 
 		assertEquals(HttpStatus.CREATED, response.getStatusCode());
 		assertNotNull(response.getBody());
 		assertEquals(id, response.getBody().id());
 		assertEquals("Cliente", response.getBody().name());
-		verify(createUserTypeUseCase).execute("Cliente");
+		verify(createUserTypeUseCase).execute("Cliente", UserTypeCode.CLIENTE);
 	}
 
 	@Test
@@ -49,7 +51,7 @@ class UserTypeControllerTest {
 		GetUserTypeByIdUseCase getUserTypeByIdUseCase = mock(GetUserTypeByIdUseCase.class);
 		UserTypeController controller = criarController(getUserTypeByIdUseCase);
 		UUID id = UUID.randomUUID();
-		when(getUserTypeByIdUseCase.execute(id)).thenReturn(new UserType(id, "Cliente"));
+		when(getUserTypeByIdUseCase.execute(id)).thenReturn(new UserType(id, "Cliente", UserTypeCode.CLIENTE));
 
 		ResponseEntity<UserTypeResponse> response = controller.findById(id);
 
@@ -66,8 +68,8 @@ class UserTypeControllerTest {
 		ListUserTypesUseCase listUserTypesUseCase = mock(ListUserTypesUseCase.class);
 		UserTypeController controller = criarController(listUserTypesUseCase);
 		when(listUserTypesUseCase.execute()).thenReturn(List.of(
-				new UserType(UUID.randomUUID(), "Cliente"),
-				new UserType(UUID.randomUUID(), "Dono de Restaurante")
+				new UserType(UUID.randomUUID(), "Cliente", UserTypeCode.CLIENTE),
+				new UserType(UUID.randomUUID(), "Dono de Restaurante", UserTypeCode.DONO_RESTAURANTE)
 		));
 
 		ResponseEntity<List<UserTypeResponse>> response = controller.findAll();
@@ -86,16 +88,19 @@ class UserTypeControllerTest {
 		UpdateUserTypeUseCase updateUserTypeUseCase = mock(UpdateUserTypeUseCase.class);
 		UserTypeController controller = criarController(updateUserTypeUseCase);
 		UUID id = UUID.randomUUID();
-		when(updateUserTypeUseCase.execute(id, "Dono de Restaurante"))
-				.thenReturn(new UserType(id, "Dono de Restaurante"));
+		when(updateUserTypeUseCase.execute(id, "Dono de Restaurante", UserTypeCode.DONO_RESTAURANTE))
+				.thenReturn(new UserType(id, "Dono de Restaurante", UserTypeCode.DONO_RESTAURANTE));
 
-		ResponseEntity<UserTypeResponse> response = controller.update(id, new UserTypeRequest("Dono de Restaurante"));
+		ResponseEntity<UserTypeResponse> response = controller.update(
+				id,
+				new UserTypeRequest("Dono de Restaurante", UserTypeCode.DONO_RESTAURANTE)
+		);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertNotNull(response.getBody());
 		assertEquals(id, response.getBody().id());
 		assertEquals("Dono de Restaurante", response.getBody().name());
-		verify(updateUserTypeUseCase).execute(id, "Dono de Restaurante");
+		verify(updateUserTypeUseCase).execute(id, "Dono de Restaurante", UserTypeCode.DONO_RESTAURANTE);
 	}
 
 	@Test

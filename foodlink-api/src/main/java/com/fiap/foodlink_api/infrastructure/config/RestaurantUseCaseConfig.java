@@ -2,6 +2,8 @@ package com.fiap.foodlink_api.infrastructure.config;
 
 import com.fiap.foodlink_api.application.usecase.restaurants.*;
 import com.fiap.foodlink_api.domain.gateway.RestaurantGateway;
+import com.fiap.foodlink_api.domain.gateway.UserGateway;
+import com.fiap.foodlink_api.domain.gateway.UserTypeGateway;
 import com.fiap.foodlink_api.domain.gateway.WorkingPeriodGateway;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,8 +17,12 @@ public class RestaurantUseCaseConfig {
     }
 
     @Bean
-    public CreateRestaurantUseCase createRestaurantUseCase(RestaurantGateway restaurantGateway) {
-        return new CreateRestaurantUseCase(restaurantGateway);
+    public CreateRestaurantUseCase createRestaurantUseCase(
+            RestaurantGateway restaurantGateway,
+            UserGateway userGateway,
+            UserTypeGateway userTypeGateway
+    ) {
+        return new CreateRestaurantUseCase(restaurantGateway, userGateway, userTypeGateway);
     }
 
     @Bean
@@ -30,7 +36,12 @@ public class RestaurantUseCaseConfig {
     }
 
     @Bean
-    public UpdateRestaurantByIdUseCase updateRestaurantByIdUseCase(RestaurantGateway restaurantGateway, WorkingPeriodGateway workingPeriodGateway) {
-        return new UpdateRestaurantByIdUseCase(restaurantGateway, workingPeriodGateway);
+    public UpdateRestaurantByIdUseCase updateRestaurantByIdUseCase(
+            RestaurantGateway restaurantGateway,
+            WorkingPeriodGateway workingPeriodGateway,
+            UserGateway userGateway,
+            UserTypeGateway userTypeGateway
+    ) {
+        return new UpdateRestaurantByIdUseCase(restaurantGateway, workingPeriodGateway, userGateway, userTypeGateway);
     }
 }

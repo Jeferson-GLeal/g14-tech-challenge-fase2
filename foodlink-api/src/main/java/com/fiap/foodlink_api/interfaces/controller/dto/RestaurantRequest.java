@@ -7,5 +7,6 @@ public record RestaurantRequest(
         String name,
         String type,
         UUID ownerId,
+        AddressRequest address,
         WorkingPeriodRequest period) {
 }

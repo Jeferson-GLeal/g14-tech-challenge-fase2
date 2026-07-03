@@ -11,14 +11,16 @@ public class UserType {
 
 	private final UUID id;
 	private String name;
+	private UserTypeCode code;
 
-	public UserType(UUID id, String name) {
+	public UserType(UUID id, String name, UserTypeCode code) {
 		this.id = id;
 		setName(name);
+		setCode(code);
 	}
 
-	public static UserType create(String name) {
-		return new UserType(null, name);
+	public static UserType create(String name, UserTypeCode code) {
+		return new UserType(null, name, code);
 	}
 
 	public UUID getId() {
@@ -29,8 +31,17 @@ public class UserType {
 		return name;
 	}
 
+	public UserTypeCode getCode() {
+		return code;
+	}
+
 	public void rename(String name) {
 		setName(name);
+	}
+
+	public void update(String name, UserTypeCode code) {
+		setName(name);
+		setCode(code);
 	}
 
 	private void setName(String name) {
@@ -47,12 +58,20 @@ public class UserType {
 		this.name = normalizedName;
 	}
 
+	private void setCode(UserTypeCode code) {
+		this.code = Objects.requireNonNull(code, "Codigo do tipo de usuario e obrigatorio.");
+	}
+
 	private String normalizeName(String name) {
 		return Objects.requireNonNullElse(name, "").trim();
 	}
 
-	public void isDono(){
-		if( !this.name.equals("Dono") ) {
+	public boolean isDono() {
+		return this.code == UserTypeCode.DONO_RESTAURANTE;
+	}
+
+	public void requireDono() {
+		if (!isDono()) {
 			throw new DomainException("Usuario nao e dono do restaurante.");
 		}
 	}

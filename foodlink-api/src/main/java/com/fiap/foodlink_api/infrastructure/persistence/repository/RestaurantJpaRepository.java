@@ -11,5 +11,6 @@ public interface RestaurantJpaRepository extends JpaRepository<RestaurantJpaEnti
 
     boolean existsByCnpj(String cnpj);
     boolean existsById(UUID id);
+    boolean existsByOwner(UUID owner);
 
 }

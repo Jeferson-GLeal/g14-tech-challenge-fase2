@@ -6,6 +6,7 @@ import com.fiap.foodlink_api.domain.exception.UserAlreadyExistsException;
 import com.fiap.foodlink_api.domain.exception.UserNotFoundException;
 import com.fiap.foodlink_api.domain.exception.UserTypeNotFoundException;
 import com.fiap.foodlink_api.domain.gateway.AddressGateway;
+import com.fiap.foodlink_api.domain.gateway.RestaurantGateway;
 import com.fiap.foodlink_api.domain.gateway.UserGateway;
 import com.fiap.foodlink_api.domain.gateway.UserTypeGateway;
 import org.junit.jupiter.api.DisplayName;
@@ -280,13 +281,16 @@ class UserUseCaseTest {
 	@DisplayName("Deve remover usuario cadastrado")
 	void deveRemoverUsuarioCadastrado() {
 		UserGateway userGateway = mock(UserGateway.class);
+		RestaurantGateway restaurantGateway = mock(RestaurantGateway.class);
 		UUID id = UUID.randomUUID();
 		when(userGateway.existsById(id)).thenReturn(true);
-		DeleteUserUseCase useCase = new DeleteUserUseCase(userGateway);
+		when(restaurantGateway.existsByOwnerId(id)).thenReturn(false);
+		DeleteUserUseCase useCase = new DeleteUserUseCase(userGateway, restaurantGateway);
 
 		useCase.execute(id);
 
 		verify(userGateway).existsById(id);
+		verify(restaurantGateway).existsByOwnerId(id);
 		verify(userGateway).deleteById(id);
 	}
 
@@ -294,9 +298,10 @@ class UserUseCaseTest {
 	@DisplayName("Deve lancar excecao ao remover usuario inexistente")
 	void deveLancarExcecaoAoRemoverUsuarioInexistente() {
 		UserGateway userGateway = mock(UserGateway.class);
+		RestaurantGateway restaurantGateway = mock(RestaurantGateway.class);
 		UUID id = UUID.randomUUID();
 		when(userGateway.existsById(id)).thenReturn(false);
-		DeleteUserUseCase useCase = new DeleteUserUseCase(userGateway);
+		DeleteUserUseCase useCase = new DeleteUserUseCase(userGateway, restaurantGateway);
 
 		UserNotFoundException exception = assertThrows(
 				UserNotFoundException.class,
@@ -304,6 +309,25 @@ class UserUseCaseTest {
 		);
 
 		assertEquals("Usuario nao encontrado: " + id, exception.getMessage());
+		verify(userGateway, never()).deleteById(id);
+	}
+
+	@Test
+	@DisplayName("Deve lancar excecao ao remover usuario dono de restaurante")
+	void deveLancarExcecaoAoRemoverUsuarioDonoDeRestaurante() {
+		UserGateway userGateway = mock(UserGateway.class);
+		RestaurantGateway restaurantGateway = mock(RestaurantGateway.class);
+		UUID id = UUID.randomUUID();
+		when(userGateway.existsById(id)).thenReturn(true);
+		when(restaurantGateway.existsByOwnerId(id)).thenReturn(true);
+		DeleteUserUseCase useCase = new DeleteUserUseCase(userGateway, restaurantGateway);
+
+		Exception exception = assertThrows(
+				RuntimeException.class,
+				() -> useCase.execute(id)
+		);
+
+		assertEquals("Usuario nao pode ser removido porque e dono de restaurante.", exception.getMessage());
 		verify(userGateway, never()).deleteById(id);
 	}
 

@@ -16,10 +16,11 @@ class UserTypeTest {
 	@Test
 	@DisplayName("Deve criar tipo de usuario com nome valido")
 	void deveCriarTipoUsuarioComNomeValido() {
-		UserType userType = UserType.create("Cliente");
+		UserType userType = UserType.create("Cliente", UserTypeCode.CLIENTE);
 
 		assertNull(userType.getId());
 		assertEquals("Cliente", userType.getName());
+		assertEquals(UserTypeCode.CLIENTE, userType.getCode());
 	}
 
 	@Test
@@ -27,16 +28,17 @@ class UserTypeTest {
 	void deveCriarTipoUsuarioComIdentificadorExistente() {
 		UUID id = UUID.randomUUID();
 
-		UserType userType = new UserType(id, "Dono de Restaurante");
+		UserType userType = new UserType(id, "Dono de Restaurante", UserTypeCode.DONO_RESTAURANTE);
 
 		assertEquals(id, userType.getId());
 		assertEquals("Dono de Restaurante", userType.getName());
+		assertEquals(UserTypeCode.DONO_RESTAURANTE, userType.getCode());
 	}
 
 	@Test
 	@DisplayName("Deve remover espacos extras do nome ao criar tipo de usuario")
 	void deveRemoverEspacosExtrasDoNomeAoCriarTipoUsuario() {
-		UserType userType = UserType.create("  Cliente  ");
+		UserType userType = UserType.create("  Cliente  ", UserTypeCode.CLIENTE);
 
 		assertEquals("Cliente", userType.getName());
 	}
@@ -44,7 +46,7 @@ class UserTypeTest {
 	@Test
 	@DisplayName("Deve renomear tipo de usuario")
 	void deveRenomearTipoUsuario() {
-		UserType userType = UserType.create("Cliente");
+		UserType userType = UserType.create("Cliente", UserTypeCode.CLIENTE);
 
 		userType.rename("Dono de Restaurante");
 
@@ -56,7 +58,7 @@ class UserTypeTest {
 	void deveLancarExcecaoQuandoNomeForNulo() {
 		DomainException exception = assertThrows(
 				DomainException.class,
-				() -> UserType.create(null)
+				() -> UserType.create(null, UserTypeCode.CLIENTE)
 		);
 
 		assertEquals("Nome do tipo de usuario e obrigatorio.", exception.getMessage());
@@ -67,7 +69,7 @@ class UserTypeTest {
 	void deveLancarExcecaoQuandoNomeEstiverEmBranco() {
 		DomainException exception = assertThrows(
 				DomainException.class,
-				() -> UserType.create("   ")
+				() -> UserType.create("   ", UserTypeCode.CLIENTE)
 		);
 
 		assertEquals("Nome do tipo de usuario e obrigatorio.", exception.getMessage());
@@ -80,9 +82,41 @@ class UserTypeTest {
 
 		DomainException exception = assertThrows(
 				DomainException.class,
-				() -> UserType.create(name)
+				() -> UserType.create(name, UserTypeCode.CLIENTE)
 		);
 
 		assertEquals("Nome do tipo de usuario deve ter no maximo 255 caracteres.", exception.getMessage());
+	}
+
+	@Test
+	@DisplayName("Deve lancar excecao quando codigo for nulo")
+	void deveLancarExcecaoQuandoCodigoForNulo() {
+		assertThrows(
+				NullPointerException.class,
+				() -> UserType.create("Cliente", null)
+		);
+	}
+
+	@Test
+	@DisplayName("Deve identificar tipo de usuario dono de restaurante")
+	void deveIdentificarTipoUsuarioDonoDeRestaurante() {
+		UserType dono = UserType.create("Dono de Restaurante", UserTypeCode.DONO_RESTAURANTE);
+		UserType cliente = UserType.create("Cliente", UserTypeCode.CLIENTE);
+
+		assertEquals(true, dono.isDono());
+		assertEquals(false, cliente.isDono());
+	}
+
+	@Test
+	@DisplayName("Deve lancar excecao ao exigir dono quando tipo nao for dono")
+	void deveLancarExcecaoAoExigirDonoQuandoTipoNaoForDono() {
+		UserType cliente = UserType.create("Cliente", UserTypeCode.CLIENTE);
+
+		DomainException exception = assertThrows(
+				DomainException.class,
+				cliente::requireDono
+		);
+
+		assertEquals("Usuario nao e dono do restaurante.", exception.getMessage());
 	}
 }

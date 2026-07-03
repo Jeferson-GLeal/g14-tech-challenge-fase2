@@ -12,5 +12,6 @@ public interface RestaurantGateway {
     Optional<Restaurant> findById(UUID id);
     boolean existsById(UUID id);
     boolean existsByCnpj(String cnpj);
+    boolean existsByOwnerId(UUID ownerId);
     void deleteById(UUID id);
 }

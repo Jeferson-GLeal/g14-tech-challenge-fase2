@@ -7,6 +7,7 @@ import com.fiap.foodlink_api.application.usecase.user.GetUserByIdUseCase;
 import com.fiap.foodlink_api.application.usecase.user.ListUsersUseCase;
 import com.fiap.foodlink_api.application.usecase.user.UpdateUserUseCase;
 import com.fiap.foodlink_api.domain.gateway.AddressGateway;
+import com.fiap.foodlink_api.domain.gateway.RestaurantGateway;
 import com.fiap.foodlink_api.domain.gateway.UserGateway;
 import com.fiap.foodlink_api.domain.gateway.UserTypeGateway;
 import org.springframework.context.annotation.Bean;
@@ -49,7 +50,7 @@ public class UserUseCaseConfig {
 	}
 
 	@Bean
-	public DeleteUserUseCase deleteUserUseCase(UserGateway userGateway) {
-		return new DeleteUserUseCase(userGateway);
+	public DeleteUserUseCase deleteUserUseCase(UserGateway userGateway, RestaurantGateway restaurantGateway) {
+		return new DeleteUserUseCase(userGateway, restaurantGateway);
 	}
 }

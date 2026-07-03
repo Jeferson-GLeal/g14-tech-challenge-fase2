@@ -49,6 +49,7 @@ public class WorkingPeriodDatabaseGateway implements WorkingPeriodGateway {
     }
 
     @Override
+    @Transactional
     public void deleteAll(UUID id) {
         workingPeriodJpaRepository.deleteAllByRestaurantId(id);
     }
