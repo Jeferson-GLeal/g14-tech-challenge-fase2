@@ -26,31 +26,35 @@ public class RestaurantJpaEntity {
     @Column(name = "dono_restaurante_id", nullable = false)
     private UUID owner;
 
+    @Column(name = "endereco_id", nullable = false)
+    private UUID addressId;
+
     @Column(name = "data_ultima_alteracao", nullable = false)
     private OffsetDateTime lastUpdatedAt;
 
-    @OneToMany
-    @JoinColumn(name = "restaurante_id")
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "restaurante_id", referencedColumnName = "id", insertable = false, updatable = false)
     private List<WorkingPeriodJpaEntity> workingPeriods;
 
     protected RestaurantJpaEntity() {
     }
 
-    public RestaurantJpaEntity(UUID id, String name, String cnpj, String type, UUID owner, OffsetDateTime lastUpdatedAt, List<WorkingPeriodJpaEntity> workingPeriods) {
+    public RestaurantJpaEntity(UUID id, String name, String cnpj, String type, UUID owner, UUID addressId, OffsetDateTime lastUpdatedAt) {
         this.id = id;
         this.name = name;
         this.cnpj = cnpj;
         this.type = type;
         this.owner = owner;
+        this.addressId = addressId;
         this.lastUpdatedAt = lastUpdatedAt;
-        this.workingPeriods = workingPeriods;
     }
 
-    public RestaurantJpaEntity(String name, String cnpj, String type, UUID owner, OffsetDateTime lastUpdatedAt) {
+    public RestaurantJpaEntity(String name, String cnpj, String type, UUID owner, UUID addressId, OffsetDateTime lastUpdatedAt) {
         this.name = name;
         this.cnpj = cnpj;
         this.type = type;
         this.owner = owner;
+        this.addressId = addressId;
         this.lastUpdatedAt = lastUpdatedAt;
     }
 
@@ -94,6 +98,14 @@ public class RestaurantJpaEntity {
         this.owner = ownerId;
     }
 
+    public UUID getAddressId() {
+        return addressId;
+    }
+
+    public void setAddressId(UUID addressId) {
+        this.addressId = addressId;
+    }
+
     public OffsetDateTime getLastUpdatedAt() {
         return lastUpdatedAt;
     }
@@ -104,9 +116,5 @@ public class RestaurantJpaEntity {
 
     public List<WorkingPeriodJpaEntity> getWorkingPeriods() {
         return workingPeriods;
-    }
-
-    public void setWorkingPeriods(List<WorkingPeriodJpaEntity> workingPeriods) {
-        this.workingPeriods = workingPeriods;
     }
 }

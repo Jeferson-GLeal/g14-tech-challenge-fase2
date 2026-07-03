@@ -2,13 +2,10 @@ package com.fiap.foodlink_api.infrastructure.persistence.mapper;
 
 import com.fiap.foodlink_api.domain.entity.Restaurant;
 import com.fiap.foodlink_api.infrastructure.persistence.entity.RestaurantJpaEntity;
-import com.fiap.foodlink_api.interfaces.controller.dto.RestaurantRequest;
 
-import java.time.OffsetDateTime;
+public final class RestaurantPersistenceMapper {
 
-public class RestaurantPersistenceMapper {
-
-    public RestaurantPersistenceMapper() {
+    private RestaurantPersistenceMapper() {
     }
 
     public static Restaurant toDomain(RestaurantJpaEntity entity) {
@@ -17,27 +14,21 @@ public class RestaurantPersistenceMapper {
                 entity.getName(),
                 entity.getCnpj(),
                 entity.getType(),
-                entity.getLastUpdatedAt(),
-                entity.getOwner()
+                entity.getOwner(),
+                entity.getAddressId(),
+                entity.getLastUpdatedAt()
         );
     }
 
     public static RestaurantJpaEntity toEntity(Restaurant restaurant) {
         return new RestaurantJpaEntity(
+                restaurant.getId(),
                 restaurant.getName(),
                 restaurant.getCnpj(),
                 restaurant.getType(),
                 restaurant.getOwnerId(),
-                OffsetDateTime.now()
+                restaurant.getAddressId(),
+                restaurant.getLastUpdatedAt()
         );
     }
-
-    public static Restaurant fromRequestToDomain(RestaurantRequest restaurantRequest) {
-        return new Restaurant(restaurantRequest.name(),
-                restaurantRequest.cnpj(),
-                restaurantRequest.type(),
-                OffsetDateTime.now(),
-                restaurantRequest.ownerId());
-    }
 }
-

@@ -1,14 +1,13 @@
 package com.fiap.foodlink_api.interfaces.controller.mapper;
 
+import com.fiap.foodlink_api.domain.entity.Address;
 import com.fiap.foodlink_api.domain.entity.Restaurant;
 import com.fiap.foodlink_api.domain.entity.User;
 import com.fiap.foodlink_api.domain.entity.WorkingPeriod;
-import com.fiap.foodlink_api.interfaces.controller.dto.RestaurantRequest;
+import com.fiap.foodlink_api.interfaces.controller.dto.AddressResponse;
 import com.fiap.foodlink_api.interfaces.controller.dto.RestaurantResponse;
-import com.fiap.foodlink_api.interfaces.controller.dto.UserResponse;
 import com.fiap.foodlink_api.interfaces.controller.dto.WorkingPeriodResponse;
 
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +16,12 @@ public class RestaurantControllerMapper {
     public RestaurantControllerMapper() {
     }
 
-    public static RestaurantResponse toResponse(Restaurant restaurant, User owner, List<WorkingPeriod> workingPeriod) {
+    public static RestaurantResponse toResponse(
+            Restaurant restaurant,
+            User owner,
+            Address address,
+            List<WorkingPeriod> workingPeriod
+    ) {
         List<WorkingPeriodResponse> workingPeriodResponses = new ArrayList<>();
         workingPeriod.forEach(wp -> {
             workingPeriodResponses.add(WorkingPeriodControllerMapper.toWorkingPeriodResponse(wp));
@@ -27,21 +31,25 @@ public class RestaurantControllerMapper {
                 restaurant.getName(),
                 restaurant.getCnpj(),
                 restaurant.getType(),
-                toUserResponse(owner),
+                owner.getId(),
+                owner.getName(),
+                toAddressResponse(address),
                 restaurant.getLastUpdatedAt(),
                 workingPeriodResponses
         );
     }
 
-    public static UserResponse toUserResponse(User user) {
-        return new UserResponse(
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.getLogin(),
-                user.getUserTypeId(),
-                null,
-                user.getLastUpdatedAt()
+    private static AddressResponse toAddressResponse(Address address) {
+        return new AddressResponse(
+                address.getId(),
+                address.getStreet(),
+                address.getNumber(),
+                address.getComplement(),
+                address.getDistrict(),
+                address.getCity(),
+                address.getState(),
+                address.getZipCode(),
+                address.getLastUpdatedAt()
         );
     }
 
@@ -51,14 +59,5 @@ public class RestaurantControllerMapper {
                 workingPeriod.getOpenTime(),
                 workingPeriod.getCloseTime()
         );
-    }
-
-    public static Restaurant fromDtoToDomain(RestaurantRequest request){
-        return new Restaurant(
-                request.name(),
-                request.cnpj(),
-                request.type(),
-                OffsetDateTime.now(),
-                request.ownerId());
     }
 }
