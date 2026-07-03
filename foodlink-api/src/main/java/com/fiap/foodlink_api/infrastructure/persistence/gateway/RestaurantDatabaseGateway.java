@@ -50,6 +50,11 @@ public class RestaurantDatabaseGateway implements RestaurantGateway {
     }
 
     @Override
+    public boolean existsByOwnerId(UUID ownerId) {
+        return restaurantJpaRepository.existsByOwner(ownerId);
+    }
+
+    @Override
     @Transactional
     public void deleteById(UUID id) {
         restaurantJpaRepository.deleteById(id);
