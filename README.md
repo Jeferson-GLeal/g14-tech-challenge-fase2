@@ -4,6 +4,8 @@
 
 Este repositorio contem a API do projeto Foodlink para o Tech Challenge - Fase 2. A aplicacao foi desenvolvida em Java com Spring Boot, organizada com separacao entre dominio, casos de uso, infraestrutura e interfaces HTTP.
 
+Tambem existe um frontend React/Vite no diretorio `frontend`, mantido como atividade extra para auxiliar os testes manuais dos endpoints principais da API.
+
 O objetivo desta fase e disponibilizar cadastros e consultas para:
 
 - Tipos de usuario
@@ -21,6 +23,7 @@ Tecnologias principais:
 - Docker / Docker Compose
 - Springdoc OpenAPI / Swagger UI
 - Maven Wrapper
+- React / Vite
 
 ---
 
@@ -31,6 +34,7 @@ Tecnologias principais:
 - [x] Executar migrations com Flyway automaticamente
 - [x] Acessar Swagger UI
 - [x] Importar collection do Postman
+- [x] Usar frontend auxiliar para testar endpoints
 - [x] Executar testes automatizados
 
 ---
@@ -55,7 +59,7 @@ java -version
 
 # Como executar via Docker Compose
 
-No diretorio raiz do projeto `foodlink-api`, execute:
+O arquivo `docker-compose.yml` fica na raiz deste repositorio para orquestrar banco, backend e frontend juntos. A partir da raiz, execute:
 
 ```bash
 docker compose up --build
@@ -65,6 +69,7 @@ O Docker Compose sobe:
 
 - PostgreSQL 15
 - Foodlink API
+- Frontend auxiliar React/Vite
 
 Configuracao padrao do banco no Docker:
 
@@ -76,7 +81,13 @@ Configuracao padrao do banco no Docker:
 A API ficara disponivel em:
 
 ```text
-http://localhost:8080
+http://localhost:8081
+```
+
+O frontend auxiliar ficara disponivel em:
+
+```text
+http://localhost:5173
 ```
 
 Para parar os containers:
@@ -107,6 +118,7 @@ Para executar a aplicacao fora do Docker, mantenha um PostgreSQL local ativo com
 Depois execute:
 
 ```bash
+cd foodlink-api
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
@@ -120,6 +132,49 @@ O profile `docker` usa:
 
 ```text
 src/main/resources/application-docker.yaml
+```
+
+---
+
+# Frontend auxiliar
+
+O frontend fica no diretorio:
+
+```text
+frontend
+```
+
+Ele foi adicionado como atividade extra para facilitar a validacao manual dos endpoints durante a avaliacao. A tela permite listar, criar, editar e remover dados dos principais recursos:
+
+- Usuarios
+- Tipos de usuario
+- Restaurantes
+- Itens de cardapio por restaurante
+
+Quando executado pelo Docker Compose, o frontend acessa a API pelo proxy interno do Vite configurado para o servico `app`:
+
+```text
+VITE_API_PROXY_TARGET=http://app:8080
+```
+
+Para executar o frontend fora do Docker, em outro terminal, use:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Nesse modo local, o Vite usa por padrao `http://localhost:8080` como destino da API. Se a API estiver rodando pelo Docker Compose, use:
+
+```bash
+VITE_API_PROXY_TARGET=http://localhost:8081 npm run dev
+```
+
+Depois acesse:
+
+```text
+http://localhost:5173
 ```
 
 ---
@@ -144,26 +199,26 @@ O Flyway roda automaticamente ao iniciar a aplicacao.
 
 # Swagger
 
-Com a aplicacao rodando, acesse:
+Com a aplicacao rodando pelo Docker Compose, acesse:
 
 ```text
-http://localhost:8080/swagger-ui.html
+http://localhost:8081/swagger-ui.html
 ```
 
 OpenAPI JSON:
 
 ```text
-http://localhost:8080/v3/api-docs
+http://localhost:8081/v3/api-docs
 ```
 
 ---
 
 # Endpoints principais
 
-Base URL local:
+Base URL via Docker Compose:
 
 ```text
-http://localhost:8080
+http://localhost:8081
 ```
 
 Recursos disponiveis:
@@ -228,7 +283,7 @@ Para importar:
 
 Variaveis incluidas na collection:
 
-- `baseUrl` - URL base da API, padrao `http://localhost:8080`
+- `baseUrl` - URL base da API, padrao recomendado com Docker Compose `http://localhost:8081`
 - `userTypeDonoId`
 - `userTypeClienteId`
 - `ownerUserId`
