@@ -1,180 +1,44 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { ConfirmModal } from './components/common/ConfirmModal';
+import { Toast, type ToastMessage } from './components/common/Toast';
+import { Metric } from './components/layout/Metric';
+import { Sidebar } from './components/layout/Sidebar';
+import { modules } from './constants/modules';
+import { MenuItemFormView } from './features/menu-items/MenuItemFormView';
+import { MenuItemsTable } from './features/menu-items/MenuItemsTable';
+import { RestaurantFormView } from './features/restaurants/RestaurantFormView';
+import { RestaurantsTable } from './features/restaurants/RestaurantsTable';
+import { UserTypeFormView } from './features/user-types/UserTypeFormView';
+import { UserTypesTable } from './features/user-types/UserTypesTable';
+import { UserFormView } from './features/users/UserFormView';
+import { UsersTable } from './features/users/UsersTable';
+import { api } from './services/api';
+import type { MenuItem, MenuItemForm, Mode, ModuleId, Restaurant, RestaurantForm, User, UserForm, UserType } from './types';
+import {
+  createMenuItemForm,
+  createRestaurantForm,
+  createUserForm,
+  emptyAddress,
+  formTitle,
+  uniqueSuffix,
+} from './utils/forms';
 
-type ModuleId = 'users' | 'userTypes' | 'restaurants' | 'menuItems';
-type Mode = 'create' | 'edit';
-
-type ApiErrorBody = {
-  message?: string;
-  error?: string;
-  details?: string;
+type DeleteRequest = {
+  afterDelete: () => Promise<void>;
+  label: string;
+  path: string;
 };
 
-type Address = {
-  street: string;
-  number: string;
-  complement: string;
-  district: string;
-  city: string;
-  state: string;
-  zipCode: string;
-};
+function getRestaurantOwnerUsers(users: User[], userTypes: UserType[]) {
+  const ownerTypeIds = new Set(
+    userTypes
+      .filter((type) => type.code === 'DONO_RESTAURANTE')
+      .map((type) => type.id),
+  );
 
-type UserType = {
-  id: string;
-  name: string;
-  code: 'DONO_RESTAURANTE' | 'CLIENTE';
-};
-
-type User = {
-  id: string;
-  name: string;
-  email: string;
-  login: string;
-  userTypeId: string;
-  address: Address;
-  lastUpdatedAt?: string;
-};
-
-type WorkingPeriod = {
-  day: string[];
-  openTime: string;
-  closeTime: string;
-};
-
-type Restaurant = {
-  id: string;
-  name: string;
-  cnpj: string;
-  type: string;
-  ownerId: string;
-  ownerName: string;
-  address: Address;
-  period: Array<{ day: string; openTime: string; closeTime: string }>;
-};
-
-type MenuItem = {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  restaurantId: string;
-  photoPath: string;
-  availableOnlyAtRestaurant: boolean;
-};
-
-type UserForm = Omit<User, 'id' | 'lastUpdatedAt'> & { password: string };
-type RestaurantForm = Omit<Restaurant, 'id' | 'ownerName' | 'period'> & { period: WorkingPeriod };
-type MenuItemForm = Omit<MenuItem, 'id' | 'restaurantId'>;
-
-const modules: Array<{ id: ModuleId; label: string; hint: string }> = [
-  { id: 'users', label: 'Usuarios', hint: 'Clientes e donos' },
-  { id: 'restaurants', label: 'Restaurantes', hint: 'Operacao e endereco' },
-  { id: 'menuItems', label: 'Cardapio', hint: 'Produtos por restaurante' },
-  { id: 'userTypes', label: 'Tipos', hint: 'Perfis do sistema' },
-];
-
-const days = ['DOMINGO', 'SEGUNDA', 'TERCA', 'QUARTA', 'QUINT', 'SEXTA', 'SABADO'];
-
-const emptyAddress: Address = {
-  street: '',
-  number: '',
-  complement: '',
-  district: '',
-  city: 'Sao Paulo',
-  state: 'SP',
-  zipCode: '',
-};
-
-const defaultAddress: Address = {
-  street: 'Rua Teste',
-  number: '123',
-  complement: 'Sala 1',
-  district: 'Centro',
-  city: 'Sao Paulo',
-  state: 'SP',
-  zipCode: '01000-000',
-};
-
-function uniqueSuffix() {
-  return Date.now().toString().slice(-6);
-}
-
-function createUserForm(userTypeId = ''): UserForm {
-  const suffix = uniqueSuffix();
-  return {
-    name: `Usuario ${suffix}`,
-    email: `usuario.${suffix}@foodlink.com`,
-    login: `usuario.${suffix}`,
-    password: '123456',
-    userTypeId,
-    address: defaultAddress,
-  };
-}
-
-function createRestaurantForm(ownerId = ''): RestaurantForm {
-  const suffix = uniqueSuffix();
-  return {
-    name: `Restaurante ${suffix}`,
-    cnpj: `98.765.${suffix.slice(0, 3)}/0001-11`,
-    type: 'Comida Rapida',
-    ownerId,
-    address: defaultAddress,
-    period: {
-      day: ['SEGUNDA', 'TERCA', 'QUARTA'],
-      openTime: '10:00',
-      closeTime: '22:00',
-    },
-  };
-}
-
-function createMenuItemForm(): MenuItemForm {
-  const suffix = uniqueSuffix();
-  return {
-    name: `Item ${suffix}`,
-    description: 'Item criado pelo painel Foodlink.',
-    price: 19.9,
-    photoPath: 'fotos/item-teste.png',
-    availableOnlyAtRestaurant: false,
-  };
-}
-
-async function api<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(path, {
-    ...init,
-    headers: {
-      Accept: 'application/json',
-      ...(init?.body ? { 'Content-Type': 'application/json' } : {}),
-      ...init?.headers,
-    },
-  });
-
-  if (!response.ok) {
-    let message = `${response.status} ${response.statusText}`;
-    try {
-      const body = (await response.json()) as ApiErrorBody;
-      message = body.message ?? body.error ?? body.details ?? message;
-    } catch {
-      message = (await response.text()) || message;
-    }
-    throw new Error(message);
-  }
-
-  if (response.status === 204) {
-    return undefined as T;
-  }
-
-  return response.json() as Promise<T>;
-}
-
-function asMoney(value: number) {
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  }).format(value);
-}
-
-function field<T extends object, K extends keyof T>(state: T, key: K, value: T[K]) {
-  return { ...state, [key]: value };
+  return ownerTypeIds.size > 0
+    ? users.filter((user) => ownerTypeIds.has(user.userTypeId))
+    : users;
 }
 
 export function App() {
@@ -186,8 +50,8 @@ export function App() {
   const [selectedRestaurantId, setSelectedRestaurantId] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [notice, setNotice] = useState('');
-  const [error, setError] = useState('');
+  const [toast, setToast] = useState<ToastMessage>();
+  const [deleteRequest, setDeleteRequest] = useState<DeleteRequest>();
   const [mode, setMode] = useState<Mode>('create');
   const [editingId, setEditingId] = useState('');
   const [userTypeForm, setUserTypeForm] = useState<Omit<UserType, 'id'>>({
@@ -199,11 +63,11 @@ export function App() {
   const [menuItemForm, setMenuItemForm] = useState<MenuItemForm>(createMenuItemForm());
 
   const ownerUsers = useMemo(() => {
-    const ownerType = userTypes.find((type) => type.code === 'DONO_RESTAURANTE');
-    return ownerType ? users.filter((user) => user.userTypeId === ownerType.id) : users;
+    return getRestaurantOwnerUsers(users, userTypes);
   }, [userTypes, users]);
 
   const selectedRestaurant = restaurants.find((restaurant) => restaurant.id === selectedRestaurantId);
+  const moduleTitle = modules.find((module) => module.id === activeModule)?.label ?? '';
 
   useEffect(() => {
     void loadBaseData();
@@ -221,9 +85,32 @@ export function App() {
     }
   }, [selectedRestaurantId]);
 
+  useEffect(() => {
+    if (ownerUsers.length === 0) return;
+    if (ownerUsers.some((owner) => owner.id === restaurantForm.ownerId)) return;
+
+    setRestaurantForm((currentForm) => ({
+      ...currentForm,
+      ownerId: ownerUsers[0].id,
+    }));
+  }, [ownerUsers, restaurantForm.ownerId]);
+
+  useEffect(() => {
+    if (!toast) return undefined;
+
+    const timeout = window.setTimeout(() => {
+      setToast(undefined);
+    }, 4200);
+
+    return () => window.clearTimeout(timeout);
+  }, [toast]);
+
+  function showToast(kind: ToastMessage['kind'], message: string) {
+    setToast({ id: Date.now(), kind, message });
+  }
+
   async function loadBaseData() {
     setLoading(true);
-    setError('');
     try {
       const [typeList, userList, restaurantList] = await Promise.all([
         api<UserType[]>('/api/user-types'),
@@ -234,9 +121,9 @@ export function App() {
       setUsers(userList);
       setRestaurants(restaurantList);
       setUserForm(createUserForm(typeList.find((type) => type.code === 'CLIENTE')?.id ?? typeList[0]?.id ?? ''));
-      setRestaurantForm(createRestaurantForm(userList[0]?.id ?? ''));
+      setRestaurantForm(createRestaurantForm(getRestaurantOwnerUsers(userList, typeList)[0]?.id ?? ''));
     } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : 'Nao foi possivel carregar os dados.');
+      showToast('danger', loadError instanceof Error ? loadError.message : 'Nao foi possivel carregar os dados.');
     } finally {
       setLoading(false);
     }
@@ -252,14 +139,14 @@ export function App() {
       setMenuItems(await api<MenuItem[]>(`/api/menu-items/${restaurantId}`));
     } catch (loadError) {
       setMenuItems([]);
-      setError(loadError instanceof Error ? loadError.message : 'Nao foi possivel carregar o cardapio.');
+      showToast('danger', loadError instanceof Error ? loadError.message : 'Nao foi possivel carregar o cardapio.');
     }
   }
 
   function resetForm(moduleId = activeModule) {
     setMode('create');
     setEditingId('');
-    setError('');
+
     if (moduleId === 'userTypes') {
       setUserTypeForm({ name: `Perfil ${uniqueSuffix()}`, code: 'CLIENTE' });
     }
@@ -276,7 +163,6 @@ export function App() {
 
   function openModule(moduleId: ModuleId) {
     setActiveModule(moduleId);
-    setNotice('');
     resetForm(moduleId);
   }
 
@@ -296,7 +182,7 @@ export function App() {
       }
       await loadBaseData();
       resetForm('userTypes');
-      setNotice('Tipo de usuario salvo.');
+      showToast('success', 'Tipo de usuario salvo.');
     });
   }
 
@@ -319,7 +205,7 @@ export function App() {
       });
       await loadBaseData();
       resetForm('users');
-      setNotice('Usuario salvo.');
+      showToast('success', 'Usuario salvo.');
     });
   }
 
@@ -332,14 +218,14 @@ export function App() {
       });
       await loadBaseData();
       resetForm('restaurants');
-      setNotice('Restaurante salvo.');
+      showToast('success', 'Restaurante salvo.');
     });
   }
 
   async function submitMenuItem(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!selectedRestaurantId) {
-      setError('Selecione um restaurante para gerenciar o cardapio.');
+      showToast('danger', 'Selecione um restaurante para gerenciar o cardapio.');
       return;
     }
 
@@ -355,32 +241,34 @@ export function App() {
       );
       await loadMenuItems(selectedRestaurantId);
       resetForm('menuItems');
-      setNotice('Item de cardapio salvo.');
+      showToast('success', 'Item de cardapio salvo.');
     });
   }
 
   async function save(action: () => Promise<void>) {
     setSaving(true);
-    setError('');
-    setNotice('');
     try {
       await action();
     } catch (saveError) {
-      setError(saveError instanceof Error ? saveError.message : 'Nao foi possivel salvar.');
+      showToast('danger', saveError instanceof Error ? saveError.message : 'Nao foi possivel salvar.');
     } finally {
       setSaving(false);
     }
   }
 
-  async function remove(path: string, afterDelete: () => Promise<void>, label: string) {
-    const confirmed = window.confirm(`Remover ${label}?`);
-    if (!confirmed) return;
+  function remove(path: string, afterDelete: () => Promise<void>, label: string) {
+    setDeleteRequest({ afterDelete, label, path });
+  }
+
+  async function confirmDelete() {
+    if (!deleteRequest) return;
 
     await save(async () => {
-      await api<void>(path, { method: 'DELETE' });
-      await afterDelete();
+      await api<void>(deleteRequest.path, { method: 'DELETE' });
+      await deleteRequest.afterDelete();
       resetForm();
-      setNotice('Registro removido.');
+      setDeleteRequest(undefined);
+      showToast('success', 'Registro removido.');
     });
   }
 
@@ -433,37 +321,9 @@ export function App() {
     });
   }
 
-  const moduleTitle = modules.find((module) => module.id === activeModule)?.label ?? '';
-
   return (
     <main className="app-shell">
-      <aside className="sidebar">
-        <div className="brand">
-          <span className="brand-mark">F</span>
-          <div>
-            <strong>Foodlink</strong>
-            <small>Admin</small>
-          </div>
-        </div>
-
-        <nav className="nav-list" aria-label="Modulos">
-          {modules.map((module) => (
-            <button
-              className={activeModule === module.id ? 'nav-item active' : 'nav-item'}
-              key={module.id}
-              onClick={() => openModule(module.id)}
-              type="button"
-            >
-              <span>{module.label}</span>
-              <small>{module.hint}</small>
-            </button>
-          ))}
-        </nav>
-
-        <a className="swagger-link" href="/swagger-ui.html" rel="noreferrer" target="_blank">
-          Abrir Swagger
-        </a>
-      </aside>
+      <Sidebar activeModule={activeModule} onOpenModule={openModule} />
 
       <section className="content">
         <header className="page-header">
@@ -482,9 +342,6 @@ export function App() {
           <Metric label="Itens ativos" value={menuItems.length} />
           <Metric label="Tipos" value={userTypes.length} />
         </section>
-
-        {notice && <div className="notice success">{notice}</div>}
-        {error && <div className="notice danger">{error}</div>}
 
         {loading ? (
           <div className="empty-state">Carregando dados...</div>
@@ -590,430 +447,17 @@ export function App() {
           </section>
         )}
       </section>
+
+      <Toast toast={toast} onClose={() => setToast(undefined)} />
+      <ConfirmModal
+        confirmLabel="Remover"
+        description={`Esta acao remove "${deleteRequest?.label ?? ''}" e nao pode ser desfeita.`}
+        loading={saving}
+        onCancel={() => setDeleteRequest(undefined)}
+        onConfirm={() => void confirmDelete()}
+        open={Boolean(deleteRequest)}
+        title="Remover registro?"
+      />
     </main>
-  );
-}
-
-function Metric({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="metric">
-      <span>{label}</span>
-      <strong>{value}</strong>
-    </div>
-  );
-}
-
-function formTitle(moduleId: ModuleId, mode: Mode) {
-  const action = mode === 'edit' ? 'Editar' : 'Cadastrar';
-  const labels: Record<ModuleId, string> = {
-    users: 'usuario',
-    restaurants: 'restaurante',
-    menuItems: 'item',
-    userTypes: 'tipo',
-  };
-  return `${action} ${labels[moduleId]}`;
-}
-
-function UsersTable({
-  onDelete,
-  onEdit,
-  types,
-  users,
-}: {
-  onDelete: (user: User) => void;
-  onEdit: (user: User) => void;
-  types: UserType[];
-  users: User[];
-}) {
-  return (
-    <>
-      <div className="section-title">
-        <h2>Usuarios cadastrados</h2>
-        <span>{users.length} registros</span>
-      </div>
-      <div className="table-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Email</th>
-              <th>Login</th>
-              <th>Tipo</th>
-              <th>Cidade</th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user.id}>
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td>{user.login}</td>
-                <td>{types.find((type) => type.id === user.userTypeId)?.name ?? user.userTypeId}</td>
-                <td>{user.address?.city ?? '-'}</td>
-                <td className="actions">
-                  <button onClick={() => onEdit(user)} type="button">Editar</button>
-                  <button className="danger-button" onClick={() => onDelete(user)} type="button">Excluir</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
-  );
-}
-
-function RestaurantsTable({
-  onDelete,
-  onEdit,
-  restaurants,
-}: {
-  onDelete: (restaurant: Restaurant) => void;
-  onEdit: (restaurant: Restaurant) => void;
-  restaurants: Restaurant[];
-}) {
-  return (
-    <>
-      <div className="section-title">
-        <h2>Restaurantes</h2>
-        <span>{restaurants.length} registros</span>
-      </div>
-      <div className="table-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Cozinha</th>
-              <th>CNPJ</th>
-              <th>Dono</th>
-              <th>Horario</th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-            {restaurants.map((restaurant) => (
-              <tr key={restaurant.id}>
-                <td>{restaurant.name}</td>
-                <td>{restaurant.type}</td>
-                <td>{restaurant.cnpj}</td>
-                <td>{restaurant.ownerName}</td>
-                <td>{restaurant.period?.[0] ? `${restaurant.period[0].openTime} - ${restaurant.period[0].closeTime}` : '-'}</td>
-                <td className="actions">
-                  <button onClick={() => onEdit(restaurant)} type="button">Editar</button>
-                  <button className="danger-button" onClick={() => onDelete(restaurant)} type="button">Excluir</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
-  );
-}
-
-function MenuItemsTable({
-  items,
-  onDelete,
-  onEdit,
-  restaurants,
-  selectedRestaurantId,
-  setSelectedRestaurantId,
-}: {
-  items: MenuItem[];
-  onDelete: (item: MenuItem) => void;
-  onEdit: (item: MenuItem) => void;
-  restaurants: Restaurant[];
-  selectedRestaurantId: string;
-  setSelectedRestaurantId: (restaurantId: string) => void;
-}) {
-  return (
-    <>
-      <div className="section-title stacked">
-        <div>
-          <h2>Itens do cardapio</h2>
-          <span>{items.length} registros</span>
-        </div>
-        <select value={selectedRestaurantId} onChange={(event) => setSelectedRestaurantId(event.target.value)}>
-          {restaurants.map((restaurant) => (
-            <option key={restaurant.id} value={restaurant.id}>{restaurant.name}</option>
-          ))}
-        </select>
-      </div>
-      <div className="table-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Descricao</th>
-              <th>Preco</th>
-              <th>Consumo local</th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item) => (
-              <tr key={item.id}>
-                <td>{item.name}</td>
-                <td>{item.description}</td>
-                <td>{asMoney(item.price)}</td>
-                <td>{item.availableOnlyAtRestaurant ? 'Sim' : 'Nao'}</td>
-                <td className="actions">
-                  <button onClick={() => onEdit(item)} type="button">Editar</button>
-                  <button className="danger-button" onClick={() => onDelete(item)} type="button">Excluir</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
-  );
-}
-
-function UserTypesTable({
-  onDelete,
-  onEdit,
-  types,
-}: {
-  onDelete: (type: UserType) => void;
-  onEdit: (type: UserType) => void;
-  types: UserType[];
-}) {
-  return (
-    <>
-      <div className="section-title">
-        <h2>Tipos de usuario</h2>
-        <span>{types.length} registros</span>
-      </div>
-      <div className="table-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Codigo</th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-            {types.map((type) => (
-              <tr key={type.id}>
-                <td>{type.name}</td>
-                <td><span className="tag">{type.code}</span></td>
-                <td className="actions">
-                  <button onClick={() => onEdit(type)} type="button">Editar</button>
-                  <button className="danger-button" onClick={() => onDelete(type)} type="button">Excluir</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
-  );
-}
-
-function UserFormView({
-  form,
-  mode,
-  onChange,
-  onSubmit,
-  saving,
-  types,
-}: {
-  form: UserForm;
-  mode: Mode;
-  onChange: (form: UserForm) => void;
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-  saving: boolean;
-  types: UserType[];
-}) {
-  return (
-    <form className="entity-form" onSubmit={onSubmit}>
-      <TextField label="Nome" value={form.name} onChange={(value) => onChange(field(form, 'name', value))} />
-      <TextField label="Email" type="email" value={form.email} onChange={(value) => onChange(field(form, 'email', value))} />
-      <TextField label="Login" value={form.login} onChange={(value) => onChange(field(form, 'login', value))} />
-      {mode === 'create' && (
-        <TextField label="Senha" type="password" value={form.password} onChange={(value) => onChange(field(form, 'password', value))} />
-      )}
-      <label className="input-field">
-        <span>Tipo</span>
-        <select value={form.userTypeId} onChange={(event) => onChange(field(form, 'userTypeId', event.target.value))}>
-          {types.map((type) => (
-            <option key={type.id} value={type.id}>{type.name}</option>
-          ))}
-        </select>
-      </label>
-      <AddressFields address={form.address} onChange={(address) => onChange(field(form, 'address', address))} />
-      <SubmitButton saving={saving} />
-    </form>
-  );
-}
-
-function RestaurantFormView({
-  form,
-  onChange,
-  onSubmit,
-  owners,
-  saving,
-}: {
-  form: RestaurantForm;
-  onChange: (form: RestaurantForm) => void;
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-  owners: User[];
-  saving: boolean;
-}) {
-  return (
-    <form className="entity-form" onSubmit={onSubmit}>
-      <TextField label="Nome" value={form.name} onChange={(value) => onChange(field(form, 'name', value))} />
-      <TextField label="CNPJ" value={form.cnpj} onChange={(value) => onChange(field(form, 'cnpj', value))} />
-      <TextField label="Tipo de cozinha" value={form.type} onChange={(value) => onChange(field(form, 'type', value))} />
-      <label className="input-field">
-        <span>Dono</span>
-        <select value={form.ownerId} onChange={(event) => onChange(field(form, 'ownerId', event.target.value))}>
-          {owners.map((owner) => (
-            <option key={owner.id} value={owner.id}>{owner.name}</option>
-          ))}
-        </select>
-      </label>
-      <AddressFields address={form.address} onChange={(address) => onChange(field(form, 'address', address))} />
-      <fieldset className="fieldset">
-        <legend>Funcionamento</legend>
-        <div className="day-grid">
-          {days.map((day) => (
-            <label key={day}>
-              <input
-                checked={form.period.day.includes(day)}
-                onChange={(event) => {
-                  const nextDays = event.target.checked
-                    ? [...form.period.day, day]
-                    : form.period.day.filter((selectedDay) => selectedDay !== day);
-                  onChange(field(form, 'period', { ...form.period, day: nextDays }));
-                }}
-                type="checkbox"
-              />
-              {day.slice(0, 3)}
-            </label>
-          ))}
-        </div>
-        <div className="two-columns">
-          <TextField label="Abre" type="time" value={form.period.openTime} onChange={(value) => onChange(field(form, 'period', { ...form.period, openTime: value }))} />
-          <TextField label="Fecha" type="time" value={form.period.closeTime} onChange={(value) => onChange(field(form, 'period', { ...form.period, closeTime: value }))} />
-        </div>
-      </fieldset>
-      <SubmitButton saving={saving} />
-    </form>
-  );
-}
-
-function MenuItemFormView({
-  disabled,
-  form,
-  onChange,
-  onSubmit,
-  saving,
-  selectedRestaurant,
-}: {
-  disabled: boolean;
-  form: MenuItemForm;
-  onChange: (form: MenuItemForm) => void;
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-  saving: boolean;
-  selectedRestaurant?: Restaurant;
-}) {
-  return (
-    <form className="entity-form" onSubmit={onSubmit}>
-      <p className="context-line">{selectedRestaurant ? `Restaurante: ${selectedRestaurant.name}` : 'Selecione um restaurante.'}</p>
-      <TextField disabled={disabled} label="Nome" value={form.name} onChange={(value) => onChange(field(form, 'name', value))} />
-      <label className="input-field">
-        <span>Descricao</span>
-        <textarea disabled={disabled} value={form.description} onChange={(event) => onChange(field(form, 'description', event.target.value))} />
-      </label>
-      <TextField disabled={disabled} label="Preco" min="0" step="0.01" type="number" value={String(form.price)} onChange={(value) => onChange(field(form, 'price', Number(value)))} />
-      <TextField disabled={disabled} label="Foto" value={form.photoPath} onChange={(value) => onChange(field(form, 'photoPath', value))} />
-      <label className="checkbox-field">
-        <input
-          checked={form.availableOnlyAtRestaurant}
-          disabled={disabled}
-          onChange={(event) => onChange(field(form, 'availableOnlyAtRestaurant', event.target.checked))}
-          type="checkbox"
-        />
-        Disponivel apenas no restaurante
-      </label>
-      <SubmitButton disabled={disabled} saving={saving} />
-    </form>
-  );
-}
-
-function UserTypeFormView({
-  form,
-  onChange,
-  onSubmit,
-  saving,
-}: {
-  form: Omit<UserType, 'id'>;
-  onChange: (form: Omit<UserType, 'id'>) => void;
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-  saving: boolean;
-}) {
-  return (
-    <form className="entity-form" onSubmit={onSubmit}>
-      <TextField label="Nome" value={form.name} onChange={(value) => onChange(field(form, 'name', value))} />
-      <label className="input-field">
-        <span>Codigo</span>
-        <select value={form.code} onChange={(event) => onChange(field(form, 'code', event.target.value as UserType['code']))}>
-          <option value="CLIENTE">CLIENTE</option>
-          <option value="DONO_RESTAURANTE">DONO_RESTAURANTE</option>
-        </select>
-      </label>
-      <SubmitButton saving={saving} />
-    </form>
-  );
-}
-
-function AddressFields({ address, onChange }: { address: Address; onChange: (address: Address) => void }) {
-  return (
-    <fieldset className="fieldset">
-      <legend>Endereco</legend>
-      <TextField label="Logradouro" value={address.street} onChange={(value) => onChange(field(address, 'street', value))} />
-      <div className="two-columns">
-        <TextField label="Numero" value={address.number} onChange={(value) => onChange(field(address, 'number', value))} />
-        <TextField label="Complemento" value={address.complement ?? ''} onChange={(value) => onChange(field(address, 'complement', value))} />
-      </div>
-      <TextField label="Bairro" value={address.district} onChange={(value) => onChange(field(address, 'district', value))} />
-      <div className="two-columns">
-        <TextField label="Cidade" value={address.city} onChange={(value) => onChange(field(address, 'city', value))} />
-        <TextField label="UF" maxLength={2} value={address.state} onChange={(value) => onChange(field(address, 'state', value.toUpperCase()))} />
-      </div>
-      <TextField label="CEP" value={address.zipCode} onChange={(value) => onChange(field(address, 'zipCode', value))} />
-    </fieldset>
-  );
-}
-
-function TextField({
-  disabled,
-  label,
-  onChange,
-  value,
-  ...props
-}: {
-  disabled?: boolean;
-  label: string;
-  onChange: (value: string) => void;
-  value: string;
-} & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value'>) {
-  return (
-    <label className="input-field">
-      <span>{label}</span>
-      <input disabled={disabled} value={value} onChange={(event) => onChange(event.target.value)} {...props} />
-    </label>
-  );
-}
-
-function SubmitButton({ disabled, saving }: { disabled?: boolean; saving: boolean }) {
-  return (
-    <button className="primary-button" disabled={disabled || saving} type="submit">
-      {saving ? 'Salvando...' : 'Salvar'}
-    </button>
   );
 }
