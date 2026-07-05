@@ -2,6 +2,7 @@ package com.fiap.foodlink_api.interfaces.controller;
 
 import com.fiap.foodlink_api.application.usecase.address.CreateAddressUseCase;
 import com.fiap.foodlink_api.application.usecase.address.GetAddressByIdUseCase;
+import com.fiap.foodlink_api.application.usecase.address.UpdateAddressUseCase;
 import com.fiap.foodlink_api.application.usecase.restaurants.*;
 import com.fiap.foodlink_api.application.usecase.user.GetUserByIdUseCase;
 import com.fiap.foodlink_api.application.usecase.workingperiod.CreateWorkingPeriodUseCase;
@@ -170,10 +171,14 @@ class RestaurantControllerTest {
 	@DisplayName("Deve atualizar restaurante")
 	void deveAtualizarRestaurante() {
 		UpdateRestaurantByIdUseCase updateRestaurantByIdUseCase = mock(UpdateRestaurantByIdUseCase.class);
+		GetRestaurantByIdUseCase getRestaurantByIdUseCase = mock(GetRestaurantByIdUseCase.class);
+		UpdateAddressUseCase updateAddressUseCase = mock(UpdateAddressUseCase.class);
 		GetAddressByIdUseCase getAddressByIdUseCase = mock(GetAddressByIdUseCase.class);
 		GetUserByIdUseCase getUserByIdUseCase = mock(GetUserByIdUseCase.class);
 		RestaurantController controller = criarController(
 				updateRestaurantByIdUseCase,
+				getRestaurantByIdUseCase,
+				updateAddressUseCase,
 				getAddressByIdUseCase,
 				getUserByIdUseCase
 		);
@@ -185,6 +190,9 @@ class RestaurantControllerTest {
 		User owner = criarUsuario(ownerId);
 		RestaurantRequest request = criarRestaurantRequest(ownerId);
 
+		when(getRestaurantByIdUseCase.execute(restaurantId)).thenReturn(restaurant);
+		when(updateAddressUseCase.execute(addressId, "Rua dos Restaurantes", "123", "Sala 10", "Centro", "Sao Paulo", "SP", "01001000"))
+				.thenReturn(address);
 		when(updateRestaurantByIdUseCase.execute(
 				eq(restaurantId),
 				eq("Pizzaria Italiana"),
@@ -194,7 +202,6 @@ class RestaurantControllerTest {
 				any()
 		)).thenReturn(restaurant);
 		when(getUserByIdUseCase.execute(ownerId)).thenReturn(owner);
-		when(getAddressByIdUseCase.execute(addressId)).thenReturn(address);
 
 		ResponseEntity<RestaurantResponse> response = controller.update(request, restaurantId);
 
@@ -202,6 +209,8 @@ class RestaurantControllerTest {
 		assertNotNull(response.getBody());
 		assertEquals(restaurantId, response.getBody().id());
 		assertEquals(addressId, response.getBody().address().id());
+		verify(getRestaurantByIdUseCase).execute(restaurantId);
+		verify(updateAddressUseCase).execute(addressId, "Rua dos Restaurantes", "123", "Sala 10", "Centro", "Sao Paulo", "SP", "01001000");
 		verify(updateRestaurantByIdUseCase).execute(
 				eq(restaurantId),
 				eq("Pizzaria Italiana"),
@@ -211,7 +220,6 @@ class RestaurantControllerTest {
 				any()
 		);
 		verify(getUserByIdUseCase).execute(ownerId);
-		verify(getAddressByIdUseCase).execute(addressId);
 	}
 
 	@Test
@@ -265,6 +273,7 @@ class RestaurantControllerTest {
 				createWorkingPeriodUseCase,
 				createAddressUseCase,
 				mock(GetAddressByIdUseCase.class),
+				mock(UpdateAddressUseCase.class),
 				mock(GetRestaurantByIdUseCase.class),
 				mock(DeleteRestauranteByIdUseCase.class),
 				mock(UpdateRestaurantByIdUseCase.class)
@@ -285,6 +294,7 @@ class RestaurantControllerTest {
 				mock(CreateWorkingPeriodUseCase.class),
 				mock(CreateAddressUseCase.class),
 				getAddressByIdUseCase,
+				mock(UpdateAddressUseCase.class),
 				getRestaurantByIdUseCase,
 				mock(DeleteRestauranteByIdUseCase.class),
 				mock(UpdateRestaurantByIdUseCase.class)
@@ -305,6 +315,7 @@ class RestaurantControllerTest {
 				mock(CreateWorkingPeriodUseCase.class),
 				mock(CreateAddressUseCase.class),
 				getAddressByIdUseCase,
+				mock(UpdateAddressUseCase.class),
 				mock(GetRestaurantByIdUseCase.class),
 				mock(DeleteRestauranteByIdUseCase.class),
 				mock(UpdateRestaurantByIdUseCase.class)
@@ -313,6 +324,8 @@ class RestaurantControllerTest {
 
 	private RestaurantController criarController(
 			UpdateRestaurantByIdUseCase updateRestaurantByIdUseCase,
+			GetRestaurantByIdUseCase getRestaurantByIdUseCase,
+			UpdateAddressUseCase updateAddressUseCase,
 			GetAddressByIdUseCase getAddressByIdUseCase,
 			GetUserByIdUseCase getUserByIdUseCase
 	) {
@@ -324,7 +337,8 @@ class RestaurantControllerTest {
 				mock(CreateWorkingPeriodUseCase.class),
 				mock(CreateAddressUseCase.class),
 				getAddressByIdUseCase,
-				mock(GetRestaurantByIdUseCase.class),
+				updateAddressUseCase,
+				getRestaurantByIdUseCase,
 				mock(DeleteRestauranteByIdUseCase.class),
 				updateRestaurantByIdUseCase
 		);
@@ -339,6 +353,7 @@ class RestaurantControllerTest {
 				mock(CreateWorkingPeriodUseCase.class),
 				mock(CreateAddressUseCase.class),
 				mock(GetAddressByIdUseCase.class),
+				mock(UpdateAddressUseCase.class),
 				mock(GetRestaurantByIdUseCase.class),
 				deleteRestauranteByIdUseCase,
 				mock(UpdateRestaurantByIdUseCase.class)

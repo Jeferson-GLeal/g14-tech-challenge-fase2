@@ -95,6 +95,8 @@ class RestaurantCrudIntegrationTest {
 				.andExpect(jsonPath("$.name").value("Restaurante Integracao Atualizado " + suffix))
 				.andExpect(jsonPath("$.cnpj").value(cnpj))
 				.andExpect(jsonPath("$.type").value("Brasileira"))
+				.andExpect(jsonPath("$.address.street").value("Rua dos Testes Atualizada"))
+				.andExpect(jsonPath("$.address.city").value("Campinas"))
 				.andExpect(jsonPath("$.period.length()").value(1))
 				.andExpect(jsonPath("$.period[0].day").value("QUARTA"));
 	}
@@ -155,13 +157,13 @@ class RestaurantCrudIntegrationTest {
 				  "type": "Brasileira",
 				  "ownerId": "%s",
 				  "address": {
-				    "street": "Avenida dos Testes",
-				    "number": "500",
-				    "complement": "Loja 2",
-				    "district": "Centro",
-				    "city": "Sao Paulo",
+				    "street": "Rua dos Testes Atualizada",
+				    "number": "900",
+				    "complement": "Sala 12",
+				    "district": "Cambuí",
+				    "city": "Campinas",
 				    "state": "SP",
-				    "zipCode": "01002-000"
+				    "zipCode": "13025-001"
 				  },
 				  "period": {
 				    "day": ["QUARTA"],
