@@ -201,7 +201,7 @@ VALUES
     (
         'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee5',
         'dddddddd-dddd-dddd-dddd-ddddddddddd2',
-        'QUINT',
+        'QUINTA',
         '12:00',
         '23:00'
     ),
@@ -466,7 +466,7 @@ VALUES
     (
         '99999999-9999-9999-9999-999999999994',
         '88888888-8888-8888-8888-888888888888',
-        'QUINT',
+        'QUINTA',
         '18:00',
         '23:00'
     ),

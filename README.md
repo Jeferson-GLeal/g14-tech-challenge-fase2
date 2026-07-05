@@ -272,14 +272,14 @@ Este repositorio inclui uma collection para facilitar os testes da API.
 Arquivo:
 
 ```text
-foodlink-api.postman_collection.json
+foodlink-api/foodlink-api.postman_collection.json
 ```
 
 Para importar:
 
 1. Abra o Postman
 2. Clique em `File -> Import`
-3. Selecione o arquivo `foodlink-api.postman_collection.json`
+3. Selecione o arquivo `foodlink-api/foodlink-api.postman_collection.json`
 
 Variaveis incluidas na collection:
 

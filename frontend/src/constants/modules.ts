@@ -7,4 +7,4 @@ export const modules: Array<{ id: ModuleId; label: string; hint: string }> = [
   { id: 'userTypes', label: 'Tipos', hint: 'Perfis do sistema' },
 ];
 
-export const days = ['DOMINGO', 'SEGUNDA', 'TERCA', 'QUARTA', 'QUINT', 'SEXTA', 'SABADO'];
+export const days = ['DOMINGO', 'SEGUNDA', 'TERCA', 'QUARTA', 'QUINTA', 'SEXTA', 'SABADO'];

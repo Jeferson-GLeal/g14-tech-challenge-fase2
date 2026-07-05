@@ -5,7 +5,7 @@ public enum DaysOfWeekEnum {
     SEGUNDA,
     TERCA,
     QUARTA,
-    QUINT,
+    QUINTA,
     SEXTA,
     SABADO;
 }
