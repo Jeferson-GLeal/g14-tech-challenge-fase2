@@ -2,8 +2,10 @@ package com.fiap.foodlink_api.application.usecase.usertype;
 
 import com.fiap.foodlink_api.domain.entity.UserType;
 import com.fiap.foodlink_api.domain.entity.UserTypeCode;
+import com.fiap.foodlink_api.domain.exception.DomainException;
 import com.fiap.foodlink_api.domain.exception.UserTypeAlreadyExistsException;
 import com.fiap.foodlink_api.domain.exception.UserTypeNotFoundException;
+import com.fiap.foodlink_api.domain.gateway.UserGateway;
 import com.fiap.foodlink_api.domain.gateway.UserTypeGateway;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -130,12 +132,13 @@ class UserTypeUseCaseTest {
 	@DisplayName("Deve atualizar nome do tipo de usuario")
 	void deveAtualizarNomeDoTipoUsuario() {
 		UserTypeGateway gateway = mock(UserTypeGateway.class);
+		UserGateway userGateway = mock(UserGateway.class);
 		UUID id = UUID.randomUUID();
 		UserType savedUserType = new UserType(id, "Cliente", UserTypeCode.CLIENTE);
 		when(gateway.findById(id)).thenReturn(Optional.of(savedUserType));
 		when(gateway.findByName("Dono de Restaurante")).thenReturn(Optional.empty());
 		when(gateway.save(any(UserType.class))).thenAnswer(invocation -> invocation.getArgument(0));
-		UpdateUserTypeUseCase useCase = new UpdateUserTypeUseCase(gateway);
+		UpdateUserTypeUseCase useCase = new UpdateUserTypeUseCase(gateway, userGateway);
 
 		UserType userType = useCase.execute(id, "Dono de Restaurante", UserTypeCode.DONO_RESTAURANTE);
 
@@ -150,12 +153,13 @@ class UserTypeUseCaseTest {
 	@DisplayName("Deve enviar tipo de usuario atualizado para persistencia")
 	void deveEnviarTipoUsuarioAtualizadoParaPersistencia() {
 		UserTypeGateway gateway = mock(UserTypeGateway.class);
+		UserGateway userGateway = mock(UserGateway.class);
 		UUID id = UUID.randomUUID();
 		UserType savedUserType = new UserType(id, "Cliente", UserTypeCode.CLIENTE);
 		when(gateway.findById(id)).thenReturn(Optional.of(savedUserType));
 		when(gateway.findByName("Dono de Restaurante")).thenReturn(Optional.empty());
 		when(gateway.save(any(UserType.class))).thenAnswer(invocation -> invocation.getArgument(0));
-		UpdateUserTypeUseCase useCase = new UpdateUserTypeUseCase(gateway);
+		UpdateUserTypeUseCase useCase = new UpdateUserTypeUseCase(gateway, userGateway);
 		ArgumentCaptor<UserType> captor = ArgumentCaptor.forClass(UserType.class);
 
 		useCase.execute(id, "Dono de Restaurante", UserTypeCode.DONO_RESTAURANTE);
@@ -169,9 +173,10 @@ class UserTypeUseCaseTest {
 	@DisplayName("Deve lancar excecao ao atualizar tipo de usuario inexistente")
 	void deveLancarExcecaoAoAtualizarTipoUsuarioInexistente() {
 		UserTypeGateway gateway = mock(UserTypeGateway.class);
+		UserGateway userGateway = mock(UserGateway.class);
 		UUID id = UUID.randomUUID();
 		when(gateway.findById(id)).thenReturn(Optional.empty());
-		UpdateUserTypeUseCase useCase = new UpdateUserTypeUseCase(gateway);
+		UpdateUserTypeUseCase useCase = new UpdateUserTypeUseCase(gateway, userGateway);
 
 		UserTypeNotFoundException exception = assertThrows(
 				UserTypeNotFoundException.class,
@@ -187,13 +192,14 @@ class UserTypeUseCaseTest {
 	@DisplayName("Deve lancar excecao ao atualizar para nome ja cadastrado em outro tipo")
 	void deveLancarExcecaoAoAtualizarParaNomeJaCadastradoEmOutroTipo() {
 		UserTypeGateway gateway = mock(UserTypeGateway.class);
+		UserGateway userGateway = mock(UserGateway.class);
 		UUID clienteId = UUID.randomUUID();
 		UUID donoId = UUID.randomUUID();
 		UserType cliente = new UserType(clienteId, "Cliente", UserTypeCode.CLIENTE);
 		UserType dono = new UserType(donoId, "Dono de Restaurante", UserTypeCode.DONO_RESTAURANTE);
 		when(gateway.findById(clienteId)).thenReturn(Optional.of(cliente));
 		when(gateway.findByName("Dono de Restaurante")).thenReturn(Optional.of(dono));
-		UpdateUserTypeUseCase useCase = new UpdateUserTypeUseCase(gateway);
+		UpdateUserTypeUseCase useCase = new UpdateUserTypeUseCase(gateway, userGateway);
 
 		UserTypeAlreadyExistsException exception = assertThrows(
 				UserTypeAlreadyExistsException.class,
@@ -210,13 +216,14 @@ class UserTypeUseCaseTest {
 	@DisplayName("Deve remover tipo de usuario cadastrado")
 	void deveRemoverTipoUsuarioCadastrado() {
 		UserTypeGateway gateway = mock(UserTypeGateway.class);
+		UserGateway userGateway = mock(UserGateway.class);
 		UUID id = UUID.randomUUID();
-		when(gateway.existsById(id)).thenReturn(true);
-		DeleteUserTypeUseCase useCase = new DeleteUserTypeUseCase(gateway);
+		when(gateway.findById(id)).thenReturn(Optional.of(new UserType(id, "Cliente", UserTypeCode.CLIENTE)));
+		DeleteUserTypeUseCase useCase = new DeleteUserTypeUseCase(gateway, userGateway);
 
 		useCase.execute(id);
 
-		verify(gateway).existsById(id);
+		verify(gateway).findById(id);
 		verify(gateway).deleteById(id);
 	}
 
@@ -224,9 +231,10 @@ class UserTypeUseCaseTest {
 	@DisplayName("Deve lancar excecao ao remover tipo de usuario inexistente")
 	void deveLancarExcecaoAoRemoverTipoUsuarioInexistente() {
 		UserTypeGateway gateway = mock(UserTypeGateway.class);
+		UserGateway userGateway = mock(UserGateway.class);
 		UUID id = UUID.randomUUID();
-		when(gateway.existsById(id)).thenReturn(false);
-		DeleteUserTypeUseCase useCase = new DeleteUserTypeUseCase(gateway);
+		when(gateway.findById(id)).thenReturn(Optional.empty());
+		DeleteUserTypeUseCase useCase = new DeleteUserTypeUseCase(gateway, userGateway);
 
 		UserTypeNotFoundException exception = assertThrows(
 				UserTypeNotFoundException.class,
@@ -234,7 +242,86 @@ class UserTypeUseCaseTest {
 		);
 
 		assertEquals("Tipo de usuario nao encontrado: " + id, exception.getMessage());
-		verify(gateway).existsById(id);
+		verify(gateway).findById(id);
 		verify(gateway, never()).deleteById(id);
+	}
+
+	@Test
+	@DisplayName("Deve alterar DONO_RESTAURANTE para outro codigo sem usuario vinculado")
+	void deveAlterarDonoParaOutroCodigoSemUsuarioVinculado() {
+		UserTypeGateway gateway = mock(UserTypeGateway.class);
+		UserGateway userGateway = mock(UserGateway.class);
+		UUID userTypeId = UUID.randomUUID();
+		UserType dono = new UserType(userTypeId, "Dono de Restaurante", UserTypeCode.DONO_RESTAURANTE);
+		when(gateway.findById(userTypeId)).thenReturn(Optional.of(dono));
+		when(gateway.findByName("Cliente")).thenReturn(Optional.empty());
+		when(userGateway.existsByUserTypeId(userTypeId)).thenReturn(false);
+		when(gateway.save(any(UserType.class))).thenAnswer(invocation -> invocation.getArgument(0));
+		UpdateUserTypeUseCase useCase = new UpdateUserTypeUseCase(gateway, userGateway);
+
+		UserType userType = useCase.execute(userTypeId, "Cliente", UserTypeCode.CLIENTE);
+
+		assertEquals(UserTypeCode.CLIENTE, userType.getCode());
+		assertEquals("Cliente", userType.getName());
+		verify(userGateway).existsByUserTypeId(userTypeId);
+		verify(gateway).save(any(UserType.class));
+	}
+
+	@Test
+	@DisplayName("Deve bloquear alteracao de DONO_RESTAURANTE com usuario vinculado")
+	void deveBloquearAlteracaoDeDonoComUsuarioVinculado() {
+		UserTypeGateway gateway = mock(UserTypeGateway.class);
+		UserGateway userGateway = mock(UserGateway.class);
+		UUID userTypeId = UUID.randomUUID();
+		UserType dono = new UserType(userTypeId, "Dono de Restaurante", UserTypeCode.DONO_RESTAURANTE);
+		when(gateway.findById(userTypeId)).thenReturn(Optional.of(dono));
+		when(userGateway.existsByUserTypeId(userTypeId)).thenReturn(true);
+		UpdateUserTypeUseCase useCase = new UpdateUserTypeUseCase(gateway, userGateway);
+
+		DomainException exception = assertThrows(
+				DomainException.class,
+				() -> useCase.execute(userTypeId, "Cliente", UserTypeCode.CLIENTE)
+		);
+
+		assertEquals("Tipo de usuário DONO_RESTAURANTE nao pode ser alterado porque existem usuários vinculados a esse tipo.", exception.getMessage());
+		verify(userGateway).existsByUserTypeId(userTypeId);
+		verify(gateway, never()).save(any(UserType.class));
+	}
+
+	@Test
+	@DisplayName("Deve remover DONO_RESTAURANTE sem usuario vinculado")
+	void deveRemoverDonoSemUsuarioVinculado() {
+		UserTypeGateway gateway = mock(UserTypeGateway.class);
+		UserGateway userGateway = mock(UserGateway.class);
+		UUID userTypeId = UUID.randomUUID();
+		UserType dono = new UserType(userTypeId, "Dono de Restaurante", UserTypeCode.DONO_RESTAURANTE);
+		when(gateway.findById(userTypeId)).thenReturn(Optional.of(dono));
+		when(userGateway.existsByUserTypeId(userTypeId)).thenReturn(false);
+		DeleteUserTypeUseCase useCase = new DeleteUserTypeUseCase(gateway, userGateway);
+
+		useCase.execute(userTypeId);
+
+		verify(userGateway).existsByUserTypeId(userTypeId);
+		verify(gateway).deleteById(userTypeId);
+	}
+
+	@Test
+	@DisplayName("Deve bloquear remocao de DONO_RESTAURANTE com usuario vinculado")
+	void deveBloquearRemocaoDeDonoComUsuarioVinculado() {
+		UserTypeGateway gateway = mock(UserTypeGateway.class);
+		UserGateway userGateway = mock(UserGateway.class);
+		UUID userTypeId = UUID.randomUUID();
+		UserType dono = new UserType(userTypeId, "Dono de Restaurante", UserTypeCode.DONO_RESTAURANTE);
+		when(gateway.findById(userTypeId)).thenReturn(Optional.of(dono));
+		when(userGateway.existsByUserTypeId(userTypeId)).thenReturn(true);
+		DeleteUserTypeUseCase useCase = new DeleteUserTypeUseCase(gateway, userGateway);
+
+		DomainException exception = assertThrows(
+				DomainException.class,
+				() -> useCase.execute(userTypeId)
+		);
+
+		assertEquals("Tipo de usuário DONO_RESTAURANTE nao pode ser removido porque existem usuários vinculados a esse tipo.", exception.getMessage());
+		verify(gateway, never()).deleteById(userTypeId);
 	}
 }

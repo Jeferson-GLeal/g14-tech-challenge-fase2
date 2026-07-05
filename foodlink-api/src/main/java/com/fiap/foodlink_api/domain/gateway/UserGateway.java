@@ -24,5 +24,7 @@ public interface UserGateway {
 
 	boolean existsByLogin(String login);
 
+	boolean existsByUserTypeId(UUID userTypeId);
+
 	void deleteById(UUID id);
 }

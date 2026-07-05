@@ -39,9 +39,10 @@ public class UserUseCaseConfig {
 	public UpdateUserUseCase updateUserUseCase(
 			UserGateway userGateway,
 			UserTypeGateway userTypeGateway,
-			AddressGateway addressGateway
+			AddressGateway addressGateway,
+			RestaurantGateway restaurantGateway
 	) {
-		return new UpdateUserUseCase(userGateway, userTypeGateway, addressGateway);
+		return new UpdateUserUseCase(userGateway, userTypeGateway, addressGateway, restaurantGateway);
 	}
 
 	@Bean
