@@ -1,6 +1,6 @@
 package com.fiap.foodlink_api.interfaces.controller.dto;
 
-import com.fiap.foodlink_api.infrastructure.persistence.enums.DaysOfWeekEnum;
+import com.fiap.foodlink_api.domain.entity.DaysOfWeekEnum;
 
 import java.time.LocalTime;
 import java.util.List;

@@ -12,7 +12,7 @@ import com.fiap.foodlink_api.domain.entity.Restaurant;
 import com.fiap.foodlink_api.domain.entity.User;
 import com.fiap.foodlink_api.domain.entity.WorkingPeriod;
 import com.fiap.foodlink_api.domain.exception.DomainException;
-import com.fiap.foodlink_api.infrastructure.persistence.enums.DaysOfWeekEnum;
+import com.fiap.foodlink_api.domain.entity.DaysOfWeekEnum;
 import com.fiap.foodlink_api.interfaces.controller.dto.AddressRequest;
 import com.fiap.foodlink_api.interfaces.controller.dto.RestaurantRequest;
 import com.fiap.foodlink_api.interfaces.controller.dto.RestaurantResponse;

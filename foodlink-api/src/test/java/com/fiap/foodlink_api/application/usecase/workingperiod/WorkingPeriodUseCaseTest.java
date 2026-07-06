@@ -5,7 +5,7 @@ import com.fiap.foodlink_api.domain.exception.WorkingPeriodNotFoundException;
 import com.fiap.foodlink_api.domain.exception.WorkingPeriorAlreadyExistsException;
 import com.fiap.foodlink_api.domain.gateway.WorkingPeriodGateway;
 import com.fiap.foodlink_api.infrastructure.persistence.entity.WorkingPeriodJpaEntity;
-import com.fiap.foodlink_api.infrastructure.persistence.enums.DaysOfWeekEnum;
+import com.fiap.foodlink_api.domain.entity.DaysOfWeekEnum;
 import com.fiap.foodlink_api.interfaces.controller.dto.WorkingPeriodRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

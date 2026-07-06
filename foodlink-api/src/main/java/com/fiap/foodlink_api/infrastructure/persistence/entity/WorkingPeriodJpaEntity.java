@@ -1,6 +1,6 @@
 package com.fiap.foodlink_api.infrastructure.persistence.entity;
 
-import com.fiap.foodlink_api.infrastructure.persistence.enums.DaysOfWeekEnum;
+import com.fiap.foodlink_api.domain.entity.DaysOfWeekEnum;
 import jakarta.persistence.*;
 
 import java.time.LocalTime;
