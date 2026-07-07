@@ -263,6 +263,10 @@ Para rodar somente testes unitarios especificos:
 ./mvnw -Dtest=UserUseCaseTest test
 ```
 
+Cobertura de codigo com Jacoco:
+
+![Cobertura de codigo - Jacoco](imagens_projeto/Cobertura%20Codigo%20-%20Jacoco.png)
+
 ---
 
 # Postman Collection
