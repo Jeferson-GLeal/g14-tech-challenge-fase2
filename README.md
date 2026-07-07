@@ -81,7 +81,7 @@ Configuracao padrao do banco no Docker:
 A API ficara disponivel em:
 
 ```text
-http://localhost:8081
+http://localhost:8080
 ```
 
 O frontend auxiliar ficara disponivel em:
@@ -165,11 +165,7 @@ npm install
 npm run dev
 ```
 
-Nesse modo local, o Vite usa por padrao `http://localhost:8080` como destino da API. Se a API estiver rodando pelo Docker Compose, use:
-
-```bash
-VITE_API_PROXY_TARGET=http://localhost:8081 npm run dev
-```
+Nesse modo local, o Vite usa por padrao `http://localhost:8080` como destino da API.
 
 Depois acesse:
 
@@ -202,13 +198,13 @@ O Flyway roda automaticamente ao iniciar a aplicacao.
 Com a aplicacao rodando pelo Docker Compose, acesse:
 
 ```text
-http://localhost:8081/swagger-ui.html
+http://localhost:8080/swagger-ui.html
 ```
 
 OpenAPI JSON:
 
 ```text
-http://localhost:8081/v3/api-docs
+http://localhost:8080/v3/api-docs
 ```
 
 ---
@@ -218,7 +214,7 @@ http://localhost:8081/v3/api-docs
 Base URL via Docker Compose:
 
 ```text
-http://localhost:8081
+http://localhost:8080
 ```
 
 Recursos disponiveis:
@@ -287,7 +283,7 @@ Para importar:
 
 Variaveis incluidas na collection:
 
-- `baseUrl` - URL base da API, padrao recomendado com Docker Compose `http://localhost:8081`
+- `baseUrl` - URL base da API, padrao recomendado com Docker Compose `http://localhost:8080`
 - `userTypeDonoId`
 - `userTypeClienteId`
 - `ownerUserId`
