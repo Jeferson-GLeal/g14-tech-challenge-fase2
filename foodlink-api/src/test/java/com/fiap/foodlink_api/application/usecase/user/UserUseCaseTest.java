@@ -1,7 +1,10 @@
 package com.fiap.foodlink_api.application.usecase.user;
 
 import com.fiap.foodlink_api.domain.entity.User;
+import com.fiap.foodlink_api.domain.entity.UserType;
+import com.fiap.foodlink_api.domain.entity.UserTypeCode;
 import com.fiap.foodlink_api.domain.exception.AddressNotFoundException;
+import com.fiap.foodlink_api.domain.exception.DomainException;
 import com.fiap.foodlink_api.domain.exception.UserAlreadyExistsException;
 import com.fiap.foodlink_api.domain.exception.UserNotFoundException;
 import com.fiap.foodlink_api.domain.exception.UserTypeNotFoundException;
@@ -197,17 +200,18 @@ class UserUseCaseTest {
 		UserGateway userGateway = mock(UserGateway.class);
 		UserTypeGateway userTypeGateway = mock(UserTypeGateway.class);
 		AddressGateway addressGateway = mock(AddressGateway.class);
+		RestaurantGateway restaurantGateway = mock(RestaurantGateway.class);
 		UUID id = UUID.randomUUID();
 		UUID userTypeId = UUID.randomUUID();
 		UUID addressId = UUID.randomUUID();
-		User savedUser = criarUsuario(id, UUID.randomUUID(), UUID.randomUUID());
+		User savedUser = criarUsuario(id, userTypeId, UUID.randomUUID());
 		when(userGateway.findById(id)).thenReturn(Optional.of(savedUser));
 		when(userGateway.findByEmail("maria@email.com")).thenReturn(Optional.empty());
 		when(userGateway.findByLogin("maria")).thenReturn(Optional.empty());
 		when(userTypeGateway.existsById(userTypeId)).thenReturn(true);
 		when(addressGateway.existsById(addressId)).thenReturn(true);
 		when(userGateway.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
-		UpdateUserUseCase useCase = new UpdateUserUseCase(userGateway, userTypeGateway, addressGateway);
+		UpdateUserUseCase useCase = new UpdateUserUseCase(userGateway, userTypeGateway, addressGateway, restaurantGateway);
 		ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
 
 		User user = useCase.execute(id, "Maria Silva", "MARIA@EMAIL.COM", "maria", userTypeId, addressId);
@@ -225,9 +229,10 @@ class UserUseCaseTest {
 		UserGateway userGateway = mock(UserGateway.class);
 		UserTypeGateway userTypeGateway = mock(UserTypeGateway.class);
 		AddressGateway addressGateway = mock(AddressGateway.class);
+		RestaurantGateway restaurantGateway = mock(RestaurantGateway.class);
 		UUID id = UUID.randomUUID();
 		when(userGateway.findById(id)).thenReturn(Optional.empty());
-		UpdateUserUseCase useCase = new UpdateUserUseCase(userGateway, userTypeGateway, addressGateway);
+		UpdateUserUseCase useCase = new UpdateUserUseCase(userGateway, userTypeGateway, addressGateway, restaurantGateway);
 
 		UserNotFoundException exception = assertThrows(
 				UserNotFoundException.class,
@@ -244,19 +249,102 @@ class UserUseCaseTest {
 		UserGateway userGateway = mock(UserGateway.class);
 		UserTypeGateway userTypeGateway = mock(UserTypeGateway.class);
 		AddressGateway addressGateway = mock(AddressGateway.class);
+		RestaurantGateway restaurantGateway = mock(RestaurantGateway.class);
 		UUID id = UUID.randomUUID();
-		User savedUser = criarUsuario(id, UUID.randomUUID(), UUID.randomUUID());
+		UUID userTypeId = UUID.randomUUID();
+		User savedUser = criarUsuario(id, userTypeId, UUID.randomUUID());
 		User otherUser = criarUsuario(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
 		when(userGateway.findById(id)).thenReturn(Optional.of(savedUser));
 		when(userGateway.findByEmail("joao@email.com")).thenReturn(Optional.of(otherUser));
-		UpdateUserUseCase useCase = new UpdateUserUseCase(userGateway, userTypeGateway, addressGateway);
+		UpdateUserUseCase useCase = new UpdateUserUseCase(userGateway, userTypeGateway, addressGateway, restaurantGateway);
 
 		UserAlreadyExistsException exception = assertThrows(
 				UserAlreadyExistsException.class,
-				() -> useCase.execute(id, "Joao Silva", "joao@email.com", "joao", UUID.randomUUID(), UUID.randomUUID())
+				() -> useCase.execute(id, "Joao Silva", "joao@email.com", "joao", userTypeId, UUID.randomUUID())
 		);
 
 		assertEquals("Usuario ja cadastrado com email: joao@email.com", exception.getMessage());
+		verify(userGateway, never()).save(any(User.class));
+	}
+
+	@Test
+	@DisplayName("Deve alterar tipo de usuario com code DONO_RESTAURANTE sem restaurante vinculado")
+	void deveAlterarTipoDeUsuarioComCodeDonoRestauranteSemRestauranteVinculado() {
+		UserGateway userGateway = mock(UserGateway.class);
+		UserTypeGateway userTypeGateway = mock(UserTypeGateway.class);
+		AddressGateway addressGateway = mock(AddressGateway.class);
+		RestaurantGateway restaurantGateway = mock(RestaurantGateway.class);
+		UUID id = UUID.randomUUID();
+		UUID currentUserTypeId = UUID.randomUUID();
+		UUID newUserTypeId = UUID.randomUUID();
+		UUID addressId = UUID.randomUUID();
+		User savedUser = criarUsuario(id, currentUserTypeId, addressId);
+		when(userGateway.findById(id)).thenReturn(Optional.of(savedUser));
+		when(restaurantGateway.existsByOwnerId(id)).thenReturn(false);
+		when(userTypeGateway.existsById(newUserTypeId)).thenReturn(true);
+		when(addressGateway.existsById(addressId)).thenReturn(true);
+		when(userGateway.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+		UpdateUserUseCase useCase = new UpdateUserUseCase(userGateway, userTypeGateway, addressGateway, restaurantGateway);
+
+		User user = useCase.execute(id, "Joao Silva", "joao@email.com", "joao", newUserTypeId, addressId);
+
+		assertEquals(newUserTypeId, user.getUserTypeId());
+		verify(restaurantGateway).existsByOwnerId(id);
+		verify(userGateway).save(any(User.class));
+	}
+
+	@Test
+	@DisplayName("Deve alterar tipo de usuario dono de restaurante para outro DONO_RESTAURANTE")
+	void deveAlterarTipoDeUsuarioDonoDeRestauranteParaOutroDonoRestaurante() {
+		UserGateway userGateway = mock(UserGateway.class);
+		UserTypeGateway userTypeGateway = mock(UserTypeGateway.class);
+		AddressGateway addressGateway = mock(AddressGateway.class);
+		RestaurantGateway restaurantGateway = mock(RestaurantGateway.class);
+		UUID id = UUID.randomUUID();
+		UUID currentUserTypeId = UUID.randomUUID();
+		UUID newUserTypeId = UUID.randomUUID();
+		UUID addressId = UUID.randomUUID();
+		User savedUser = criarUsuario(id, currentUserTypeId, addressId);
+		when(userGateway.findById(id)).thenReturn(Optional.of(savedUser));
+		when(restaurantGateway.existsByOwnerId(id)).thenReturn(true);
+		when(userTypeGateway.findById(newUserTypeId))
+				.thenReturn(Optional.of(new UserType(newUserTypeId, "Dono novo", UserTypeCode.DONO_RESTAURANTE)));
+		when(userTypeGateway.existsById(newUserTypeId)).thenReturn(true);
+		when(addressGateway.existsById(addressId)).thenReturn(true);
+		when(userGateway.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+		UpdateUserUseCase useCase = new UpdateUserUseCase(userGateway, userTypeGateway, addressGateway, restaurantGateway);
+
+		User user = useCase.execute(id, "Joao Silva", "joao@email.com", "joao", newUserTypeId, addressId);
+
+		assertEquals(newUserTypeId, user.getUserTypeId());
+		verify(userTypeGateway).findById(newUserTypeId);
+		verify(userGateway).save(any(User.class));
+	}
+
+	@Test
+	@DisplayName("Deve bloquear alteracao de tipo de usuario vinculado como dono de restaurante")
+	void deveBloquearAlteracaoDeTipoDeUsuarioVinculadoComoDonoDeRestaurante() {
+		UserGateway userGateway = mock(UserGateway.class);
+		UserTypeGateway userTypeGateway = mock(UserTypeGateway.class);
+		AddressGateway addressGateway = mock(AddressGateway.class);
+		RestaurantGateway restaurantGateway = mock(RestaurantGateway.class);
+		UUID id = UUID.randomUUID();
+		UUID currentUserTypeId = UUID.randomUUID();
+		UUID newUserTypeId = UUID.randomUUID();
+		UUID addressId = UUID.randomUUID();
+		User savedUser = criarUsuario(id, currentUserTypeId, addressId);
+		when(userGateway.findById(id)).thenReturn(Optional.of(savedUser));
+		when(restaurantGateway.existsByOwnerId(id)).thenReturn(true);
+		when(userTypeGateway.findById(newUserTypeId))
+				.thenReturn(Optional.of(new UserType(newUserTypeId, "Cliente", UserTypeCode.CLIENTE)));
+		UpdateUserUseCase useCase = new UpdateUserUseCase(userGateway, userTypeGateway, addressGateway, restaurantGateway);
+
+		DomainException exception = assertThrows(
+				DomainException.class,
+				() -> useCase.execute(id, "Joao Silva", "joao@email.com", "joao", newUserTypeId, addressId)
+		);
+
+		assertEquals("Tipo de usuario nao pode ser alterado porque o usuario e dono de restaurante.", exception.getMessage());
 		verify(userGateway, never()).save(any(User.class));
 	}
 

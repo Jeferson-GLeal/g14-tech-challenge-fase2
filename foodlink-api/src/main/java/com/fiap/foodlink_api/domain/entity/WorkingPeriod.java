@@ -1,9 +1,6 @@
 package com.fiap.foodlink_api.domain.entity;
 
-import com.fiap.foodlink_api.infrastructure.persistence.enums.DaysOfWeekEnum;
-
 import java.time.LocalTime;
-import java.time.OffsetDateTime;
 
 public class WorkingPeriod {
     private DaysOfWeekEnum day;

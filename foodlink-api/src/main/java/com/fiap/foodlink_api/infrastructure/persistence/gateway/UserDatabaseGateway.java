@@ -69,6 +69,11 @@ public class UserDatabaseGateway implements UserGateway {
 	}
 
 	@Override
+	public boolean existsByUserTypeId(UUID userTypeId) {
+		return userJpaRepository.existsByUserTypeId(userTypeId);
+	}
+
+	@Override
 	@Transactional
 	public void deleteById(UUID id) {
 		userJpaRepository.deleteById(id);

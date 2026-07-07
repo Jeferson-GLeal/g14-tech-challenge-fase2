@@ -1,8 +1,7 @@
 INSERT INTO tipos_usuario (id, nome, codigo)
 VALUES
     ('11111111-1111-1111-1111-111111111111', 'Dono de Restaurante', 'DONO_RESTAURANTE'),
-    ('22222222-2222-2222-2222-222222222222', 'Cliente', 'CLIENTE')
-ON CONFLICT (id) DO NOTHING;
+    ('22222222-2222-2222-2222-222222222222', 'Cliente', 'CLIENTE');
 
 INSERT INTO enderecos (
     id,
@@ -81,8 +80,7 @@ VALUES
         'SP',
         '01405-001',
         CURRENT_TIMESTAMP
-    )
-ON CONFLICT (id) DO NOTHING;
+    );
 
 INSERT INTO usuarios (
     id,
@@ -124,8 +122,7 @@ VALUES
         CURRENT_TIMESTAMP,
         '11111111-1111-1111-1111-111111111111',
         'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb3'
-    )
-ON CONFLICT (id) DO NOTHING;
+    );
 
 INSERT INTO restaurantes (
     id,
@@ -163,8 +160,7 @@ VALUES
         CURRENT_TIMESTAMP,
         'Brasileira',
         'cccccccc-cccc-cccc-cccc-ccccccccccc3'
-    )
-ON CONFLICT (id) DO NOTHING;
+    );
 
 INSERT INTO horarios_funcionamento_restaurante (
     id,
@@ -205,7 +201,7 @@ VALUES
     (
         'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee5',
         'dddddddd-dddd-dddd-dddd-ddddddddddd2',
-        'QUINT',
+        'QUINTA',
         '12:00',
         '23:00'
     ),
@@ -236,8 +232,7 @@ VALUES
         'DOMINGO',
         '11:00',
         '16:00'
-    )
-ON CONFLICT (id) DO NOTHING;
+    );
 
 INSERT INTO itens_cardapio (
     id,
@@ -339,8 +334,7 @@ VALUES
         'fotos/pudim-de-leite.png',
         true,
         CURRENT_TIMESTAMP
-    )
-ON CONFLICT (id) DO NOTHING;
+    );
 
 INSERT INTO enderecos (
     id,
@@ -386,8 +380,7 @@ VALUES
         'SP',
         '05422-000',
         CURRENT_TIMESTAMP
-    )
-ON CONFLICT (id) DO NOTHING;
+    );
 
 INSERT INTO usuarios (
     id,
@@ -419,8 +412,7 @@ VALUES
         CURRENT_TIMESTAMP,
         '22222222-2222-2222-2222-222222222222',
         '44444444-4444-4444-4444-444444444444'
-    )
-ON CONFLICT (id) DO NOTHING;
+    );
 
 INSERT INTO restaurantes (
     id,
@@ -440,8 +432,7 @@ VALUES
         CURRENT_TIMESTAMP,
         'Italiana',
         '66666666-6666-6666-6666-666666666666'
-    )
-ON CONFLICT (id) DO NOTHING;
+    );
 
 INSERT INTO horarios_funcionamento_restaurante (
     id,
@@ -475,7 +466,7 @@ VALUES
     (
         '99999999-9999-9999-9999-999999999994',
         '88888888-8888-8888-8888-888888888888',
-        'QUINT',
+        'QUINTA',
         '18:00',
         '23:00'
     ),
@@ -485,8 +476,7 @@ VALUES
         'SEXTA',
         '18:00',
         '23:59'
-    )
-ON CONFLICT (id) DO NOTHING;
+    );
 
 INSERT INTO itens_cardapio (
     id,
@@ -528,5 +518,4 @@ VALUES
         'fotos/refrigerante-lata.png',
         true,
         CURRENT_TIMESTAMP
-    )
-ON CONFLICT (id) DO NOTHING;
+    );

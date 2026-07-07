@@ -1,11 +1,11 @@
-package com.fiap.foodlink_api.infrastructure.persistence.enums;
+package com.fiap.foodlink_api.domain.entity;
 
 public enum DaysOfWeekEnum {
     DOMINGO,
     SEGUNDA,
     TERCA,
     QUARTA,
-    QUINT,
+    QUINTA,
     SEXTA,
     SABADO;
 }

@@ -1,12 +1,10 @@
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 CREATE TABLE tipos_usuario (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY,
     nome VARCHAR(255) NOT NULL UNIQUE
 );
 
 CREATE TABLE enderecos (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY,
     logradouro VARCHAR(255) NOT NULL,
     numero VARCHAR(50) NOT NULL,
     complemento VARCHAR(255),
@@ -18,7 +16,7 @@ CREATE TABLE enderecos (
 );
 
 CREATE TABLE usuarios (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     login VARCHAR(255) NOT NULL UNIQUE,
@@ -37,7 +35,7 @@ CREATE TABLE usuarios (
 );
 
 CREATE TABLE restaurantes (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     cnpj VARCHAR(18) NOT NULL UNIQUE,
     endereco_id UUID NOT NULL,
@@ -55,7 +53,7 @@ CREATE TABLE restaurantes (
 );
 
 CREATE TABLE horarios_funcionamento_restaurante (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY,
     restaurante_id UUID NOT NULL,
     dias_semana VARCHAR(20) NOT NULL,
     hora_abertura TIME NOT NULL,
@@ -71,7 +69,7 @@ CREATE TABLE horarios_funcionamento_restaurante (
 );
 
 CREATE TABLE itens_cardapio (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     descricao VARCHAR(400) NOT NULL,
     preco DECIMAL(10,2) NOT NULL,

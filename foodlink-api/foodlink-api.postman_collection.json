@@ -2,728 +2,428 @@
   "info": {
     "_postman_id": "8e7e3b2d-2c7d-4d3a-bf35-foodlinkfase2",
     "name": "Foodlink API - G14 - Fase 2",
-    "description": "Collection para testar a API Foodlink - Tech Challenge Fase 2",
+    "description": "Collection para testar a API Foodlink - Tech Challenge Fase 2. Endpoints e variaveis alinhados ao README.md.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "SUCESSO",
+      "name": "Tipos de Usuario",
       "item": [
         {
-          "name": "Tipos de Usuario",
-          "item": [
-            {
-              "name": "Listar tipos de usuario - GET /api/user-types",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/user-types",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "user-types"
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "200 - Exemplo",
-                  "originalRequest": {
-                    "method": "GET",
-                    "header": [],
-                    "url": {
-                      "raw": "{{baseUrl}}/api/user-types",
-                      "host": [
-                        "{{baseUrl}}"
-                      ],
-                      "path": [
-                        "api",
-                        "user-types"
-                      ]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "header": [
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    }
-                  ],
-                  "cookie": [],
-                  "body": "[\n  {\n    \"id\": \"11111111-1111-1111-1111-111111111111\",\n    \"name\": \"Dono de Restaurante\"\n  },\n  {\n    \"id\": \"22222222-2222-2222-2222-222222222222\",\n    \"name\": \"Cliente\"\n  }\n]"
-                }
-              ]
-            },
-            {
-              "name": "Buscar tipo de usuario por ID - GET /api/user-types/:id",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/user-types/{{userTypeClienteId}}",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "user-types",
-                    "{{userTypeClienteId}}"
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "200 - Exemplo",
-                  "originalRequest": {
-                    "method": "GET",
-                    "header": [],
-                    "url": {
-                      "raw": "{{baseUrl}}/api/user-types/{{userTypeClienteId}}",
-                      "host": [
-                        "{{baseUrl}}"
-                      ],
-                      "path": [
-                        "api",
-                        "user-types",
-                        "{{userTypeClienteId}}"
-                      ]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "header": [
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    }
-                  ],
-                  "cookie": [],
-                  "body": "{\n  \"id\": \"{{userTypeClienteId}}\",\n  \"name\": \"Cliente\"\n}"
-                }
-              ]
-            },
-            {
-              "name": "Criar tipo de usuario - POST /api/user-types",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "try {",
-                      "  const json = pm.response.json();",
-                      "  if (json && json.id) {",
-                      "    pm.collectionVariables.set('createdUserTypeId', json.id);",
-                      "  }",
-                      "} catch (e) {",
-                      "  console.error('Erro ao atualizar createdUserTypeId:', e);",
-                      "}"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"name\": \"Administrador\"\n}"
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/api/user-types",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "user-types"
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "201 - Tipo criado",
-                  "originalRequest": {
-                    "method": "POST",
-                    "header": [
-                      {
-                        "key": "Content-Type",
-                        "value": "application/json"
-                      }
-                    ],
-                    "body": {
-                      "mode": "raw",
-                      "raw": "{\n  \"name\": \"Administrador\"\n}"
-                    },
-                    "url": {
-                      "raw": "{{baseUrl}}/api/user-types",
-                      "host": [
-                        "{{baseUrl}}"
-                      ],
-                      "path": [
-                        "api",
-                        "user-types"
-                      ]
-                    }
-                  },
-                  "status": "Created",
-                  "code": 201,
-                  "header": [
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    }
-                  ],
-                  "cookie": [],
-                  "body": "{\n  \"id\": \"00000000-0000-0000-0000-000000000010\",\n  \"name\": \"Administrador\"\n}"
-                }
-              ]
-            },
-            {
-              "name": "Atualizar tipo de usuario - PUT /api/user-types/:id",
-              "request": {
-                "method": "PUT",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"name\": \"Administrador Atualizado\"\n}"
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/api/user-types/{{createdUserTypeId}}",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "user-types",
-                    "{{createdUserTypeId}}"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Remover tipo de usuario - DELETE /api/user-types/:id",
-              "request": {
-                "method": "DELETE",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/user-types/{{createdUserTypeId}}",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "user-types",
-                    "{{createdUserTypeId}}"
-                  ]
-                }
-              },
-              "response": []
-            }
-          ]
+          "name": "Listar tipos de usuario - GET /api/user-types",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/user-types"
+          }
         },
         {
-          "name": "Usuarios",
-          "item": [
-            {
-              "name": "Listar usuarios - GET /api/users",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/users",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users"
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "200 - Exemplo",
-                  "originalRequest": {
-                    "method": "GET",
-                    "header": [],
-                    "url": {
-                      "raw": "{{baseUrl}}/api/users",
-                      "host": [
-                        "{{baseUrl}}"
-                      ],
-                      "path": [
-                        "api",
-                        "users"
-                      ]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "header": [
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    }
-                  ],
-                  "cookie": [],
-                  "body": "[\n  {\n    \"id\": \"66666666-6666-6666-6666-666666666666\",\n    \"name\": \"Dono Foodlink\",\n    \"email\": \"dono@foodlink.com\",\n    \"login\": \"dono.foodlink\",\n    \"userTypeId\": \"11111111-1111-1111-1111-111111111111\",\n    \"address\": {\n      \"id\": \"33333333-3333-3333-3333-333333333333\",\n      \"street\": \"Avenida Paulista\",\n      \"number\": \"1000\",\n      \"complement\": \"Conjunto 101\",\n      \"district\": \"Bela Vista\",\n      \"city\": \"Sao Paulo\",\n      \"state\": \"SP\",\n      \"zipCode\": \"01310-100\"\n    }\n  }\n]"
-                }
-              ]
-            },
-            {
-              "name": "Buscar usuario por ID - GET /api/users/:id",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/users/{{ownerUserId}}",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "{{ownerUserId}}"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Criar usuario - POST /api/users",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "try {",
-                      "  const json = pm.response.json();",
-                      "  if (json && json.id) {",
-                      "    pm.collectionVariables.set('createdUserId', json.id);",
-                      "  }",
-                      "} catch (e) {",
-                      "  console.error('Erro ao atualizar createdUserId:', e);",
-                      "}"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"name\": \"Usuario Postman\",\n  \"email\": \"usuario.postman@foodlink.com\",\n  \"login\": \"usuario.postman\",\n  \"password\": \"123456\",\n  \"userTypeId\": \"{{userTypeClienteId}}\",\n  \"address\": {\n    \"street\": \"Rua Teste Postman\",\n    \"number\": \"123\",\n    \"complement\": \"Apto 1\",\n    \"district\": \"Centro\",\n    \"city\": \"Sao Paulo\",\n    \"state\": \"SP\",\n    \"zipCode\": \"01000-000\"\n  }\n}"
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/api/users",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Atualizar usuario - PUT /api/users/:id",
-              "request": {
-                "method": "PUT",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"name\": \"Usuario Postman Atualizado\",\n  \"email\": \"usuario.postman.atualizado@foodlink.com\",\n  \"login\": \"usuario.postman.atualizado\",\n  \"password\": \"123456\",\n  \"userTypeId\": \"{{userTypeClienteId}}\",\n  \"address\": {\n    \"street\": \"Rua Teste Postman Atualizada\",\n    \"number\": \"456\",\n    \"complement\": \"Casa\",\n    \"district\": \"Centro\",\n    \"city\": \"Sao Paulo\",\n    \"state\": \"SP\",\n    \"zipCode\": \"01000-001\"\n  }\n}"
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/api/users/{{createdUserId}}",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "{{createdUserId}}"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Alterar senha - PATCH /api/users/:id/password",
-              "request": {
-                "method": "PATCH",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"password\": \"novaSenha123\"\n}"
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/api/users/{{createdUserId}}/password",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "{{createdUserId}}",
-                    "password"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Remover usuario - DELETE /api/users/:id",
-              "request": {
-                "method": "DELETE",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/users/{{createdUserId}}",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "users",
-                    "{{createdUserId}}"
-                  ]
-                }
-              },
-              "response": []
-            }
-          ]
+          "name": "Buscar tipo de usuario por ID - GET /api/user-types/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/user-types/{{userTypeClienteId}}"
+          }
         },
         {
-          "name": "Restaurantes",
-          "item": [
+          "name": "Criar tipo de usuario - POST /api/user-types",
+          "event": [
             {
-              "name": "Listar restaurantes - GET /restaurants",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/restaurants",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "restaurants"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Buscar restaurante por ID - GET /restaurants/:id",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/restaurants/{{restaurantId}}",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "restaurants",
-                    "{{restaurantId}}"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Criar restaurante - POST /restaurants",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "try {",
-                      "  const json = pm.response.json();",
-                      "  if (json && json.id) {",
-                      "    pm.collectionVariables.set('createdRestaurantId', json.id);",
-                      "  }",
-                      "} catch (e) {",
-                      "  console.error('Erro ao atualizar createdRestaurantId:', e);",
-                      "}"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json && json.id) {",
+                  "    pm.collectionVariables.set('createdUserTypeId', json.id);",
+                  "  }",
+                  "} catch (e) {",
+                  "  console.error('Erro ao atualizar createdUserTypeId:', e);",
+                  "}"
                 ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"cnpj\": \"56.789.012/0001-40\",\n  \"name\": \"Foodlink Postman\",\n  \"type\": \"Teste\",\n  \"ownerId\": \"{{ownerUserId}}\",\n  \"period\": {\n    \"day\": [\"SEGUNDA\", \"TERCA\", \"QUARTA\"],\n    \"openTime\": \"10:00:00\",\n    \"closeTime\": \"22:00:00\"\n  }\n}"
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/restaurants",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "restaurants"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Atualizar restaurante - PUT /restaurants/:id",
-              "request": {
-                "method": "PUT",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"cnpj\": \"56.789.012/0001-40\",\n  \"name\": \"Foodlink Postman Atualizado\",\n  \"type\": \"Teste Atualizado\",\n  \"ownerId\": \"{{ownerUserId}}\",\n  \"period\": {\n    \"day\": [\"SEGUNDA\", \"TERCA\", \"QUARTA\"],\n    \"openTime\": \"10:00:00\",\n    \"closeTime\": \"22:00:00\"\n  }\n}"
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/restaurants/{{createdRestaurantId}}",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "restaurants",
-                    "{{createdRestaurantId}}"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Remover restaurante - DELETE /restaurants/:id",
-              "request": {
-                "method": "DELETE",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/restaurants/{{createdRestaurantId}}",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "restaurants",
-                    "{{createdRestaurantId}}"
-                  ]
-                }
-              },
-              "response": []
+                "type": "text/javascript"
+              }
             }
-          ]
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cliente Postman\",\n  \"code\": \"CLIENTE\"\n}"
+            },
+            "url": "{{baseUrl}}/api/user-types",
+            "description": "O campo code aceita os valores do enum: DONO_RESTAURANTE ou CLIENTE. Se ja existir registro com o mesmo codigo no banco, o banco pode retornar conflito de unicidade."
+          }
         },
         {
-          "name": "Itens do Cardapio",
-          "item": [
-            {
-              "name": "Listar itens por restaurante - GET /api/menu-items/:restaurantId",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/menu-items/{{restaurantId}}",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "menu-items",
-                    "{{restaurantId}}"
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "200 - Exemplo",
-                  "originalRequest": {
-                    "method": "GET",
-                    "header": [],
-                    "url": {
-                      "raw": "{{baseUrl}}/api/menu-items/{{restaurantId}}",
-                      "host": [
-                        "{{baseUrl}}"
-                      ],
-                      "path": [
-                        "api",
-                        "menu-items",
-                        "{{restaurantId}}"
-                      ]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "header": [
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    }
-                  ],
-                  "cookie": [],
-                  "body": "[\n  {\n    \"id\": \"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1\",\n    \"name\": \"Pizza Margherita\",\n    \"description\": \"Pizza com molho de tomate, mussarela e manjericao.\",\n    \"price\": 49.90,\n    \"restaurantId\": \"88888888-8888-8888-8888-888888888888\",\n    \"photoPath\": \"fotos/pizza-margherita.png\",\n    \"availableOnlyAtRestaurant\": false\n  }\n]"
-                }
-              ]
+          "name": "Atualizar tipo de usuario - PUT /api/user-types/:id",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cliente Atualizado\",\n  \"code\": \"CLIENTE\"\n}"
             },
+            "url": "{{baseUrl}}/api/user-types/{{createdUserTypeId}}"
+          }
+        },
+        {
+          "name": "Remover tipo de usuario - DELETE /api/user-types/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/user-types/{{createdUserTypeId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "Listar usuarios - GET /api/users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/users"
+          }
+        },
+        {
+          "name": "Buscar usuario por ID - GET /api/users/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/users/{{ownerUserId}}"
+          }
+        },
+        {
+          "name": "Criar usuario - POST /api/users",
+          "event": [
             {
-              "name": "Buscar item por ID - GET /api/menu-items/:restaurantId/:id",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/menu-items/{{restaurantId}}/{{menuItemId}}",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "menu-items",
-                    "{{restaurantId}}",
-                    "{{menuItemId}}"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Criar item - POST /api/menu-items/:restaurantId",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "try {",
-                      "  const json = pm.response.json();",
-                      "  if (json && json.id) {",
-                      "    pm.collectionVariables.set('createdMenuItemId', json.id);",
-                      "  }",
-                      "} catch (e) {",
-                      "  console.error('Erro ao atualizar createdMenuItemId:', e);",
-                      "}"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json && json.id) {",
+                  "    pm.collectionVariables.set('createdUserId', json.id);",
+                  "  }",
+                  "} catch (e) {",
+                  "  console.error('Erro ao atualizar createdUserId:', e);",
+                  "}"
                 ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"name\": \"Item Postman\",\n  \"description\": \"Item criado via collection Postman.\",\n  \"price\": 29.90,\n  \"photoPath\": \"fotos/item-postman.png\",\n  \"availableOnlyAtRestaurant\": false\n}"
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/api/menu-items/{{restaurantId}}",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "menu-items",
-                    "{{restaurantId}}"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Atualizar item - PUT /api/menu-items/:restaurantId/:id",
-              "request": {
-                "method": "PUT",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"name\": \"Item Postman Atualizado\",\n  \"description\": \"Item atualizado via collection Postman.\",\n  \"price\": 34.90,\n  \"photoPath\": \"fotos/item-postman-atualizado.png\",\n  \"availableOnlyAtRestaurant\": true\n}"
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/api/menu-items/{{restaurantId}}/{{createdMenuItemId}}",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "menu-items",
-                    "{{restaurantId}}",
-                    "{{createdMenuItemId}}"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Remover item - DELETE /api/menu-items/:restaurantId/:id",
-              "request": {
-                "method": "DELETE",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/menu-items/{{restaurantId}}/{{createdMenuItemId}}",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "menu-items",
-                    "{{restaurantId}}",
-                    "{{createdMenuItemId}}"
-                  ]
-                }
-              },
-              "response": []
+                "type": "text/javascript"
+              }
             }
-          ]
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Usuario Postman\",\n  \"email\": \"usuario.postman@foodlink.com\",\n  \"login\": \"usuario.postman\",\n  \"password\": \"123456\",\n  \"userTypeId\": \"{{userTypeClienteId}}\",\n  \"address\": {\n    \"street\": \"Rua Teste Postman\",\n    \"number\": \"123\",\n    \"complement\": \"Apto 1\",\n    \"district\": \"Centro\",\n    \"city\": \"Sao Paulo\",\n    \"state\": \"SP\",\n    \"zipCode\": \"01000-000\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/api/users"
+          }
+        },
+        {
+          "name": "Atualizar usuario - PUT /api/users/:id",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Usuario Postman Atualizado\",\n  \"email\": \"usuario.postman.atualizado@foodlink.com\",\n  \"login\": \"usuario.postman.atualizado\",\n  \"password\": \"123456\",\n  \"userTypeId\": \"{{userTypeClienteId}}\",\n  \"address\": {\n    \"street\": \"Rua Teste Postman Atualizada\",\n    \"number\": \"456\",\n    \"complement\": \"Casa\",\n    \"district\": \"Centro\",\n    \"city\": \"Sao Paulo\",\n    \"state\": \"SP\",\n    \"zipCode\": \"01000-001\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/api/users/{{createdUserId}}"
+          }
+        },
+        {
+          "name": "Alterar senha - PATCH /api/users/:id/password",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"novaSenha123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users/{{createdUserId}}/password"
+          }
+        },
+        {
+          "name": "Remover usuario - DELETE /api/users/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/users/{{createdUserId}}",
+            "description": "Usuarios donos de restaurantes nao podem ser removidos enquanto estiverem vinculados a restaurantes."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Restaurantes",
+      "item": [
+        {
+          "name": "Listar restaurantes - GET /restaurants",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/restaurants"
+          }
+        },
+        {
+          "name": "Buscar restaurante por ID - GET /restaurants/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/restaurants/{{sushiRestaurantId}}"
+          }
+        },
+        {
+          "name": "Criar restaurante - POST /restaurants",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json && json.id) {",
+                  "    pm.collectionVariables.set('createdRestaurantId', json.id);",
+                  "  }",
+                  "} catch (e) {",
+                  "  console.error('Erro ao atualizar createdRestaurantId:', e);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cnpj\": \"56.789.012/0001-40\",\n  \"name\": \"Foodlink Postman\",\n  \"type\": \"Teste\",\n  \"ownerId\": \"{{ownerUserId}}\",\n  \"address\": {\n    \"street\": \"Rua Restaurante Postman\",\n    \"number\": \"500\",\n    \"complement\": \"Loja 2\",\n    \"district\": \"Centro\",\n    \"city\": \"Sao Paulo\",\n    \"state\": \"SP\",\n    \"zipCode\": \"01000-010\"\n  },\n  \"period\": {\n    \"day\": [\"SEGUNDA\", \"TERCA\", \"QUARTA\"],\n    \"openTime\": \"10:00:00\",\n    \"closeTime\": \"22:00:00\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/restaurants"
+          }
+        },
+        {
+          "name": "Atualizar restaurante - PUT /restaurants/:id",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cnpj\": \"56.789.012/0001-40\",\n  \"name\": \"Foodlink Postman Atualizado\",\n  \"type\": \"Teste Atualizado\",\n  \"ownerId\": \"{{ownerUserId}}\",\n  \"address\": {\n    \"street\": \"Rua Restaurante Postman Atualizada\",\n    \"number\": \"700\",\n    \"complement\": \"Loja 4\",\n    \"district\": \"Centro\",\n    \"city\": \"Sao Paulo\",\n    \"state\": \"SP\",\n    \"zipCode\": \"01000-020\"\n  },\n  \"period\": {\n    \"day\": [\"SEGUNDA\", \"TERCA\", \"QUARTA\"],\n    \"openTime\": \"10:00:00\",\n    \"closeTime\": \"22:00:00\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/restaurants/{{createdRestaurantId}}"
+          }
+        },
+        {
+          "name": "Remover restaurante - DELETE /restaurants/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/restaurants/{{createdRestaurantId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Itens do Cardapio",
+      "item": [
+        {
+          "name": "Listar itens por restaurante - GET /api/menu-items/:restaurantId",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/menu-items/{{sushiRestaurantId}}"
+          }
+        },
+        {
+          "name": "Buscar item por ID - GET /api/menu-items/:restaurantId/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/menu-items/{{sushiRestaurantId}}/{{menuItemId}}"
+          }
+        },
+        {
+          "name": "Criar item - POST /api/menu-items/:restaurantId",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json && json.id) {",
+                  "    pm.collectionVariables.set('createdMenuItemId', json.id);",
+                  "    pm.collectionVariables.set('menuItemId', json.id);",
+                  "  }",
+                  "} catch (e) {",
+                  "  console.error('Erro ao atualizar createdMenuItemId/menuItemId:', e);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Item Postman\",\n  \"description\": \"Item criado via collection Postman.\",\n  \"price\": 29.90,\n  \"photoPath\": \"fotos/item-postman.png\",\n  \"availableOnlyAtRestaurant\": false\n}"
+            },
+            "url": "{{baseUrl}}/api/menu-items/{{sushiRestaurantId}}"
+          }
+        },
+        {
+          "name": "Atualizar item - PUT /api/menu-items/:restaurantId/:id",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Item Postman Atualizado\",\n  \"description\": \"Item atualizado via collection Postman.\",\n  \"price\": 34.90,\n  \"photoPath\": \"fotos/item-postman-atualizado.png\",\n  \"availableOnlyAtRestaurant\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/menu-items/{{sushiRestaurantId}}/{{menuItemId}}"
+          }
+        },
+        {
+          "name": "Remover item - DELETE /api/menu-items/:restaurantId/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/menu-items/{{sushiRestaurantId}}/{{menuItemId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cenarios de Erro",
+      "item": [
+        {
+          "name": "Enum invalido - POST /api/user-types",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tipo Invalido\",\n  \"code\": \"DONO_RESTAURANTEs\"\n}"
+            },
+            "url": "{{baseUrl}}/api/user-types",
+            "description": "Deve retornar 400 informando os valores aceitos do enum UserTypeCode."
+          }
+        },
+        {
+          "name": "Formato invalido - PUT /restaurants/:id com period em lista",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Foodlink Pizzaria\",\n  \"cnpj\": \"12345678000190\",\n  \"type\": \"Italiana\",\n  \"ownerId\": \"{{ownerUserId}}\",\n  \"address\": {\n    \"street\": \"Rua dos Pinheiros\",\n    \"number\": \"250\",\n    \"complement\": \"Loja 1\",\n    \"district\": \"Pinheiros\",\n    \"city\": \"Sao Paulo\",\n    \"state\": \"SP\",\n    \"zipCode\": \"05422-000\"\n  },\n  \"period\": [\n    {\n      \"day\": \"SEGUNDA\",\n      \"openTime\": \"18:00:00\",\n      \"closeTime\": \"23:00:00\"\n    }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/restaurants/{{sushiRestaurantId}}",
+            "description": "Deve retornar 400 indicando que period esta em formato invalido. O contrato atual espera objeto, nao lista."
+          }
+        },
+        {
+          "name": "Endereco obrigatorio - POST /restaurants sem address",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cnpj\": \"99.999.999/0001-99\",\n  \"name\": \"Restaurante Sem Endereco\",\n  \"type\": \"Teste\",\n  \"ownerId\": \"{{ownerUserId}}\",\n  \"period\": {\n    \"day\": [\"SEGUNDA\"],\n    \"openTime\": \"10:00:00\",\n    \"closeTime\": \"22:00:00\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/restaurants",
+            "description": "Deve retornar 400 porque o cadastro de restaurante exige endereco."
+          }
+        },
+        {
+          "name": "Usuario dono vinculado - DELETE /api/users/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/users/{{ownerUserId}}",
+            "description": "Deve retornar 400 porque usuario dono nao pode ser removido enquanto possuir restaurante vinculado."
+          }
+        },
+        {
+          "name": "Restaurante inexistente - GET /restaurants/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/restaurants/{{notFoundId}}",
+            "description": "Deve retornar 404 quando o restaurante nao existir."
+          }
         }
       ]
     }
@@ -746,7 +446,7 @@
     },
     {
       "key": "ownerUserId",
-      "value": "66666666-6666-6666-6666-666666666666",
+      "value": "cccccccc-cccc-cccc-cccc-ccccccccccc1",
       "type": "string"
     },
     {
@@ -776,7 +476,7 @@
     },
     {
       "key": "menuItemId",
-      "value": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1",
+      "value": "ffffffff-ffff-ffff-ffff-fffffffffff1",
       "type": "string"
     },
     {
@@ -797,6 +497,11 @@
     {
       "key": "createdMenuItemId",
       "value": "",
+      "type": "string"
+    },
+    {
+      "key": "notFoundId",
+      "value": "99999999-9999-9999-9999-999999999999",
       "type": "string"
     }
   ]

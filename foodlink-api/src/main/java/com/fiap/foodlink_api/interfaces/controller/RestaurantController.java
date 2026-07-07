@@ -3,6 +3,7 @@ package com.fiap.foodlink_api.interfaces.controller;
 import com.fiap.foodlink_api.application.usecase.restaurants.*;
 import com.fiap.foodlink_api.application.usecase.address.CreateAddressUseCase;
 import com.fiap.foodlink_api.application.usecase.address.GetAddressByIdUseCase;
+import com.fiap.foodlink_api.application.usecase.address.UpdateAddressUseCase;
 import com.fiap.foodlink_api.application.usecase.user.GetUserByIdUseCase;
 import com.fiap.foodlink_api.application.usecase.workingperiod.CreateWorkingPeriodUseCase;
 import com.fiap.foodlink_api.application.usecase.workingperiod.GetWorkingPeriodByIdUseCase;
@@ -40,6 +41,7 @@ public class RestaurantController {
     private final CreateWorkingPeriodUseCase createWorkingPeriodUseCase;
     private final CreateAddressUseCase createAddressUseCase;
     private final GetAddressByIdUseCase getAddressByIdUseCase;
+    private final UpdateAddressUseCase updateAddressUseCase;
 
     public RestaurantController(
             ListRestaurantsUseCase listRestaurantsUseCase,
@@ -49,6 +51,7 @@ public class RestaurantController {
             CreateWorkingPeriodUseCase createWorkingPeriodUseCase,
             CreateAddressUseCase createAddressUseCase,
             GetAddressByIdUseCase getAddressByIdUseCase,
+            UpdateAddressUseCase updateAddressUseCase,
             GetRestaurantByIdUseCase getRestaurantByIdUseCase,
             DeleteRestauranteByIdUseCase deleteRestauranteByIdUseCase,
             UpdateRestaurantByIdUseCase updateRestaurantByIdUseCase
@@ -60,6 +63,7 @@ public class RestaurantController {
         this.createWorkingPeriodUseCase = createWorkingPeriodUseCase;
         this.createAddressUseCase = createAddressUseCase;
         this.getAddressByIdUseCase = getAddressByIdUseCase;
+        this.updateAddressUseCase = updateAddressUseCase;
         this.getRestaurantByIdUseCase = getRestaurantByIdUseCase;
         this.deleteRestauranteByIdUseCase = deleteRestauranteByIdUseCase;
         this.updateRestaurantByIdUseCase = updateRestaurantByIdUseCase;
@@ -123,6 +127,8 @@ public class RestaurantController {
     @PutMapping("/{id}")
     @Operation(summary = "Atualiza os dados do restaurante por ID")
     public ResponseEntity<RestaurantResponse> update(@RequestBody RestaurantRequest request, @PathVariable UUID id) {
+        Restaurant currentRestaurant = getRestaurantByIdUseCase.execute(id);
+        Address address = updateAddress(currentRestaurant.getAddressId(), request.address());
         List<WorkingPeriod> workingPeriodList = WorkingPeriodControllerMapper.toWorkingPeriod(request.period());
         Restaurant updatedRestaurant = updateRestaurantByIdUseCase.execute(
                 id,
@@ -133,7 +139,6 @@ public class RestaurantController {
                 workingPeriodList
         );
         User owner = getUserByIdUseCase.execute(updatedRestaurant.getOwnerId());
-        Address address = getAddressByIdUseCase.execute(updatedRestaurant.getAddressId());
         return ResponseEntity.ok(RestaurantControllerMapper.toResponse(updatedRestaurant, owner, address, workingPeriodList));
     }
 
@@ -143,6 +148,23 @@ public class RestaurantController {
         }
 
         return createAddressUseCase.execute(
+                request.street(),
+                request.number(),
+                request.complement(),
+                request.district(),
+                request.city(),
+                request.state(),
+                request.zipCode()
+        );
+    }
+
+    private Address updateAddress(UUID id, AddressRequest request) {
+        if (request == null) {
+            throw new DomainException("Endereco do restaurante e obrigatorio.");
+        }
+
+        return updateAddressUseCase.execute(
+                id,
                 request.street(),
                 request.number(),
                 request.complement(),

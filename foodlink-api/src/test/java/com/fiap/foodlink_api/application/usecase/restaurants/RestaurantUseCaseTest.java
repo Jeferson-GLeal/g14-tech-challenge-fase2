@@ -13,7 +13,7 @@ import com.fiap.foodlink_api.domain.gateway.RestaurantGateway;
 import com.fiap.foodlink_api.domain.gateway.UserGateway;
 import com.fiap.foodlink_api.domain.gateway.UserTypeGateway;
 import com.fiap.foodlink_api.domain.gateway.WorkingPeriodGateway;
-import com.fiap.foodlink_api.infrastructure.persistence.enums.DaysOfWeekEnum;
+import com.fiap.foodlink_api.domain.entity.DaysOfWeekEnum;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

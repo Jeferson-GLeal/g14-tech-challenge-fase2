@@ -5,6 +5,7 @@ import com.fiap.foodlink_api.application.usecase.usertype.DeleteUserTypeUseCase;
 import com.fiap.foodlink_api.application.usecase.usertype.GetUserTypeByIdUseCase;
 import com.fiap.foodlink_api.application.usecase.usertype.ListUserTypesUseCase;
 import com.fiap.foodlink_api.application.usecase.usertype.UpdateUserTypeUseCase;
+import com.fiap.foodlink_api.domain.gateway.UserGateway;
 import com.fiap.foodlink_api.domain.gateway.UserTypeGateway;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,12 +29,12 @@ public class UserTypeUseCaseConfig {
 	}
 
 	@Bean
-	public UpdateUserTypeUseCase updateUserTypeUseCase(UserTypeGateway userTypeGateway) {
-		return new UpdateUserTypeUseCase(userTypeGateway);
+	public UpdateUserTypeUseCase updateUserTypeUseCase(UserTypeGateway userTypeGateway, UserGateway userGateway) {
+		return new UpdateUserTypeUseCase(userTypeGateway, userGateway);
 	}
 
 	@Bean
-	public DeleteUserTypeUseCase deleteUserTypeUseCase(UserTypeGateway userTypeGateway) {
-		return new DeleteUserTypeUseCase(userTypeGateway);
+	public DeleteUserTypeUseCase deleteUserTypeUseCase(UserTypeGateway userTypeGateway, UserGateway userGateway) {
+		return new DeleteUserTypeUseCase(userTypeGateway, userGateway);
 	}
 }
