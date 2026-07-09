@@ -15,6 +15,7 @@ import com.fiap.foodlink_api.domain.exception.DomainException;
 import com.fiap.foodlink_api.interfaces.controller.dto.AddressRequest;
 import com.fiap.foodlink_api.interfaces.controller.dto.RestaurantRequest;
 import com.fiap.foodlink_api.interfaces.controller.dto.RestaurantResponse;
+import com.fiap.foodlink_api.interfaces.controller.dto.WorkingPeriodRequest;
 import com.fiap.foodlink_api.interfaces.controller.mapper.RestaurantControllerMapper;
 import com.fiap.foodlink_api.interfaces.controller.mapper.WorkingPeriodControllerMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -99,6 +100,7 @@ public class RestaurantController {
     @PostMapping
     @Operation(summary = "Cria um novo restaurante com horário de funcionamento e dono")
     public ResponseEntity<RestaurantResponse> create(@RequestBody RestaurantRequest request){
+        validateWorkingPeriod(request.period());
         Address address = createAddress(request.address());
         Restaurant restaurant = createRestaurantUseCase.execute(
                 request.name(),
@@ -127,6 +129,7 @@ public class RestaurantController {
     @PutMapping("/{id}")
     @Operation(summary = "Atualiza os dados do restaurante por ID")
     public ResponseEntity<RestaurantResponse> update(@RequestBody RestaurantRequest request, @PathVariable UUID id) {
+        validateWorkingPeriod(request.period());
         Restaurant currentRestaurant = getRestaurantByIdUseCase.execute(id);
         Address address = updateAddress(currentRestaurant.getAddressId(), request.address());
         List<WorkingPeriod> workingPeriodList = WorkingPeriodControllerMapper.toWorkingPeriod(request.period());
@@ -173,5 +176,23 @@ public class RestaurantController {
                 request.state(),
                 request.zipCode()
         );
+    }
+
+    private void validateWorkingPeriod(WorkingPeriodRequest request) {
+        if (request == null) {
+            throw new DomainException("Horario de funcionamento do restaurante e obrigatorio.");
+        }
+
+        if (request.day() == null || request.day().isEmpty()) {
+            throw new DomainException("Dia de funcionamento do restaurante e obrigatorio.");
+        }
+
+        if (request.openTime() == null || request.closeTime() == null) {
+            throw new DomainException("Horario de abertura e fechamento do restaurante sao obrigatorios.");
+        }
+
+        if (!request.openTime().isBefore(request.closeTime())) {
+            throw new DomainException("Horario de abertura deve ser menor que o horario de fechamento.");
+        }
     }
 }

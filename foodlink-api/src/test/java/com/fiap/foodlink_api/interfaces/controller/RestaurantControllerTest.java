@@ -34,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -257,6 +258,39 @@ class RestaurantControllerTest {
 		DomainException exception = assertThrows(DomainException.class, () -> controller.create(request));
 
 		assertEquals("Endereco do restaurante e obrigatorio.", exception.getMessage());
+	}
+
+	@Test
+	@DisplayName("Deve lancar excecao quando horario de fechamento for menor que abertura")
+	void deveLancarExcecaoQuandoHorarioFechamentoForMenorQueAbertura() {
+		CreateRestaurantUseCase createRestaurantUseCase = mock(CreateRestaurantUseCase.class);
+		CreateAddressUseCase createAddressUseCase = mock(CreateAddressUseCase.class);
+		CreateWorkingPeriodUseCase createWorkingPeriodUseCase = mock(CreateWorkingPeriodUseCase.class);
+		RestaurantController controller = criarController(
+				createRestaurantUseCase,
+				createAddressUseCase,
+				createWorkingPeriodUseCase,
+				mock(GetUserByIdUseCase.class)
+		);
+		RestaurantRequest request = new RestaurantRequest(
+				"12.345.678/0001-99",
+				"Pizzaria Italiana",
+				"Italiana",
+				UUID.randomUUID(),
+				new AddressRequest("Rua dos Restaurantes", "123", "Sala 10", "Centro", "Sao Paulo", "SP", "01001000"),
+				new WorkingPeriodRequest(
+						List.of(DaysOfWeekEnum.SEGUNDA),
+						LocalTime.of(10, 0),
+						LocalTime.of(9, 0)
+				)
+		);
+
+		DomainException exception = assertThrows(DomainException.class, () -> controller.create(request));
+
+		assertEquals("Horario de abertura deve ser menor que o horario de fechamento.", exception.getMessage());
+		verify(createAddressUseCase, never()).execute(any(), any(), any(), any(), any(), any(), any());
+		verify(createRestaurantUseCase, never()).execute(any(), any(), any(), any(), any());
+		verify(createWorkingPeriodUseCase, never()).execute(any(), any());
 	}
 
 	private RestaurantController criarController(
